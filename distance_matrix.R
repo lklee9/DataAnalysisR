@@ -44,6 +44,13 @@ AddToDistance <- function(distanceMatrix, distToAttPair) {
     return(distanceMatrix)
   }
   else {
-    return(AddToDistance(distanceMatrix, distToAttPair[2:length(distToAttPair)]))
+    if (length(distToAttPair) %% 2 == 1) {
+      distanceMatrix <- AddToDistance(distanceMatrix, distToAttPair[2:((length(distToAttPair) + 1)/2)])
+      distanceMatrix <- AddToDistance(distanceMatrix, distToAttPair[((length(distToAttPair) + 1)/2):length(distToAttPair)])
+      return(distanceMatrix)
+    }
+    else {
+      return(AddToDistance(distanceMatrix, distToAttPair[2:length(distToAttPair)]))
+    }
   }
 }
