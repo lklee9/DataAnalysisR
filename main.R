@@ -1,6 +1,7 @@
 source("distance_matrix.R")
 source("visualisation.R")
 source("result_table.R")
+source("read_data.R")
 
 
 #file_path = "../data_out/martvard/airlines_4-attributes_prior.csv"
@@ -15,4 +16,11 @@ runVisualisation <- function(file_path) {
   MDS(distanceMatrix, attributes.all)
 }
 
-runVisualisation(file_path)
+require(foreign)
+HistogramAnalysis <- function(file1, file2=NA){
+  data.all <- ReadArffData(file1, file2)
+  Histogram(data.all[[1]], data.all[[2]])
+}
+
+file1 <- "../datasets/train_seed/20130419.arff"
+file2 <- "../datasets/train_seed/20131129.arff"
