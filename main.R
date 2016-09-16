@@ -2,6 +2,7 @@ source("distance_matrix.R")
 source("visualisation.R")
 source("result_table.R")
 source("read_data.R")
+source("compare_distributions.R")
 
 
 #file_path = "../data_out/martvard/airlines_4-attributes_prior.csv"
