@@ -1,0 +1,147 @@
+---
+title: "Results"
+author: "Loong Kuan"
+date: "16 September 2016"
+output: html_document
+---
+
+```{r setup, echo = FALSE}
+options(width=80)
+knitr::opts_chunk$set(echo = FALSE, out.width='750px', dpi=200)
+library(knitr)
+library(ggplot2)
+library(ggrepel)
+library(reshape2)
+library(gridExtra)
+library(grid)
+library(foreign)
+read_chunk("../read_data.R")
+read_chunk("../result_table.R")
+read_chunk("../distance_matrix.R")
+read_chunk("../visualisation.R")
+read_chunk("../compare_distributions.R")
+read_chunk("../coditioned_covariates.R")
+```
+
+
+
+
+## Original Data of 2 Dates
+```{r}
+<<arff>>
+```
+
+
+Load the satellite data set on the day *2013-05-05* and *2013-11-29*.
+```{r load_satellite}
+file1 <- "../../datasets/train_seed/20130505.arff"
+file2 <- "../../datasets/train_seed/20131129.arff"
+data.all <- ReadArffData(file1, file2)
+```
+Data from *2013-05-05*.
+```{r}
+print(head(data.all[[1]], 5))
+```
+Data from *2013-11-29*.
+```{r}
+print(head(data.all[[2]], 5))
+```
+
+Histogram of the data by attributes.
+```{r, echo = FALSE}
+<<visualisation>>
+<<compare>>
+  Histogram(data.all[[1]], data.all[[2]])
+```
+
+
+## Drift Results
+The raw data of the results will be provided at the end of this document.
+```{r, include=F}
+<<results>>
+  results.prior.1 <- ResultTable("../../data_out/martvard/20130505_20131129_1-attributes_prior.csv")
+  results.prior.2 <- ResultTable("../../data_out/martvard/20130505_20131129_2-attributes_prior.csv")
+  results.cc.1 <- ResultTable("../../data_out/martvard/20130505_20131129_1-attributes_ConditionedCovariate.csv")
+  results.pos.1 <- ResultTable("../../data_out/martvard/20130505_20131129_1-attributes_posterior.csv")
+```
+
+### Covariate Drift
+The following is the results for a test of 1 Attribute. 
+We can verify the correctness of the results by comparing them to the histograms of the attributes above.
+
+```{r}
+<<visualisation>>
+  SingleHistogramVisual(results.prior.1)
+```
+
+From the results above, we can observe that the value distribution of the **id_class** attributes does not change.
+Logically, this makes sense if the crop designgnation for each area is constant over the year.
+
+-----------------------------------------
+
+The following is the covariate results for 2 Attributes.
+This plot is just an exercise on how results from larger amounts of attributes might be visualised.
+
+The plot is made by first constructing a "distance matrix" where the distance obtained for each pair of attribute is represneted.
+
+```{r}
+<<visualisation>>
+<<distance_matrix>>
+  attributes.all <- ExtractAttributes(results.prior.2)
+  distanceMatrix <- DistanceMatrix(results.prior.2)
+  print(distanceMatrix)
+```
+
+This matrix is then plotted using Multidimensional Scaling to visualise the distances in the matrix.
+The final plot will then plot attributes that have a higher dirft together further apart.
+
+```{r}
+  MDS(distanceMatrix, attributes.all)
+```
+
+From the MDS above, we can observe that, as expected the 2 highest drifters, 
+**band5** and **brightness** are pretty far away from most other attributes.
+
+
+We can also plot the distance matrix as a heatmap to directly view the results. 
+However this method only works with 2 attribute tests.
+```{r}
+  DualHistogramVisual(results.prior.2)
+```
+
+
+
+### Conditioned Covaraites (Single Attributes)
+```{r}
+<<covar>>
+  JointVisualisation(results.cc.1)
+```
+We can observe that attributes **band 5** and **brightness** drifts greater than other attributes for most given classes.
+Furthermore, most attributes given classes **other_oilseed** and **sunflower** seems to drift between the 2 dates.
+
+### Posterior (1 Attribute)
+For the posterior results of 1 attribute, all of the results show *0* posterior drift between the 2 dates.
+
+## Raw Data
+### Covariate Drift (1 Attribute)
+```{r}
+print(results.prior.1)
+```
+
+### Covariate Drift (2 Attribute)
+```{r}
+print(results.prior.2)
+```
+
+### Coditioned Covariate Drift (1 Attribute)
+```{r}
+print(results.cc.1)
+```
+
+### Posterior (1 Attribute)
+```{r}
+print(results.pos.1)
+```
+
+--------------------------------------------------------------------------------
+

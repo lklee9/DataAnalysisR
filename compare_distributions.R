@@ -5,6 +5,8 @@ library(gridExtra)
 library(grid)
 source("visualisation.R")
 
+## ---- compare
+
 Histogram <- function(data1, data2) {
   plot.list <- list()
   for (i in 1:length(data1)) {
@@ -43,7 +45,8 @@ SingleHistogram <- function(data1, data2, column.index) {
     else {
       if ((max(data.all[,1]) - min(data.all[,1])) > 0) {
         plot <- ggplot(data.all, aes(value, fill = type)) + 
-          geom_histogram(alpha = 0.5, position = "identity", binwidth = ((max(data.all[,1]) - min(data.all[,1]))/50))
+          #geom_histogram(alpha = 0.5, position = "identity", binwidth = ((max(data.all[,1]) - min(data.all[,1]))/50))
+          geom_histogram(alpha = 0.5, position = "identity", binwidth = 10)
         plot <- plot + labs(xlab(column.name))
       }
       else {
@@ -54,3 +57,5 @@ SingleHistogram <- function(data1, data2, column.index) {
     }
     return(plot)
 }
+
+## ---- end-of-compare

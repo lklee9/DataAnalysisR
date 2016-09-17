@@ -1,3 +1,5 @@
+## ---- distance_matrix
+
 DistanceMatrix <- function(data.table) {
   attributes <- ExtractAttributes(data.table)
   distanceMatrix <- matrix(0, nrow = length(attributes), ncol = length(attributes))
@@ -11,6 +13,7 @@ ExtractAttributes <- function(data.table) {
   attributes.separated <- Reduce(function(x, y) Map(c, x, strsplit(y, "_")), data.attributes, init="")[[1]]
   attributes.all <- Filter(function(x) x != "", attributes.separated)
   attributes <- unique(attributes.all)
+  attributes <- Filter(function(x) x != "id", attributes)
   return(attributes)
 }
 
@@ -54,3 +57,5 @@ AddToDistance <- function(distanceMatrix, distToAttPair) {
     }
   }
 }
+
+## ---- end-of-distance_matrix
