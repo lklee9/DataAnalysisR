@@ -51,9 +51,10 @@ Histogram of the data by attributes.
 ```{r, echo = FALSE}
 <<visualisation>>
 <<compare>>
+```
+```{r, echo = FALSE}
   Histogram(data.all[[1]], data.all[[2]])
 ```
-
 
 ## Drift Results
 The raw data of the results will be provided at the end of this document.
@@ -70,12 +71,14 @@ The following is the results for a test of 1 Attribute.
 We can verify the correctness of the results by comparing them to the histograms of the attributes above.
 
 ```{r}
-<<visualisation>>
   SingleHistogramVisual(results.prior.1)
 ```
 
 From the results above, we can observe that the value distribution of the **id_class** attributes does not change.
 Logically, this makes sense if the crop designgnation for each area is constant over the year.
+
+Interesting to note that high drift is more likely to be measured if there is a point where the difference in frequency between the 2 dates is very high,
+rather than a slight difference in frequencies over a learger range of values.
 
 -----------------------------------------
 
@@ -85,7 +88,6 @@ This plot is just an exercise on how results from larger amounts of attributes m
 The plot is made by first constructing a "distance matrix" where the distance obtained for each pair of attribute is represneted.
 
 ```{r}
-<<visualisation>>
 <<distance_matrix>>
   attributes.all <- ExtractAttributes(results.prior.2)
   distanceMatrix <- DistanceMatrix(results.prior.2)
@@ -101,10 +103,12 @@ The final plot will then plot attributes that have a higher dirft together furth
 
 From the MDS above, we can observe that, as expected the 2 highest drifters, 
 **band5** and **brightness** are pretty far away from most other attributes.
+**NDVI** and **NDWI** is pretty isolated too followed by **band1**.
 
 
 We can also plot the distance matrix as a heatmap to directly view the results. 
 However this method only works with 2 attribute tests.
+
 ```{r}
   DualHistogramVisual(results.prior.2)
 ```
@@ -116,32 +120,19 @@ However this method only works with 2 attribute tests.
 <<covar>>
   JointVisualisation(results.cc.1)
 ```
+
 We can observe that attributes **band 5** and **brightness** drifts greater than other attributes for most given classes.
-Furthermore, most attributes given classes **other_oilseed** and **sunflower** seems to drift between the 2 dates.
+Furthermore, most attributes given classes **other_oilseed** and **sunflower** seems to have a greater drift between the 2 dates.
 
 ### Posterior (1 Attribute)
 For the posterior results of 1 attribute, all of the results show *0* posterior drift between the 2 dates.
 
-## Raw Data
-### Covariate Drift (1 Attribute)
-```{r}
-print(results.prior.1)
-```
-
-### Covariate Drift (2 Attribute)
-```{r}
-print(results.prior.2)
-```
-
-### Coditioned Covariate Drift (1 Attribute)
-```{r}
-print(results.cc.1)
-```
-
-### Posterior (1 Attribute)
-```{r}
-print(results.pos.1)
-```
-
 --------------------------------------------------------------------------------
+
+## Raw Data
+https://github.com/LeeLoongKuan/DriftMapper/tree/master/data_out/martvard
+
+## Raw Plots
+https://github.com/LeeLoongKuan/DriftMapper/tree/master/DataAnalysisR/Plots
+
 
