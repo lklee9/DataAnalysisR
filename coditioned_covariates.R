@@ -5,6 +5,8 @@ library(gridExtra)
 library(grid)
 source("visualisation.R")
 
+## ---- covar
+
 SeparateByClass <- function(data.all) {
   data.class.factor <- factor(data.all[, length(data.all)])
   data.class.values <- levels(data.class.factor)
@@ -79,3 +81,5 @@ JointVisualisation <- function(data.all) {
   #  ggtitle("Conditioned Covariate Drift")
   return(plot)
 }
+
+## ---- end-of-covar

@@ -1,3 +1,4 @@
+## ---- results
 # Public ---------------------------------------------------
 
 # A table that contains only distances for a set 
@@ -29,3 +30,5 @@ ReadData <- function(file.path, class.name) {
   }
   return(data.raw)
 }
+
+## ---- end-of-results
