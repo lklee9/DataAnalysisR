@@ -5,12 +5,7 @@ library(gridExtra)
 library(grid)
 source("visualisation.R")
 
-## ---- covar
-
-SeparateByClass <- function(data.all) {
-  data.class.factor <- factor(data.all[, length(data.all)])
-  data.class.values <- levels(data.class.factor)
-}
+## ---- cond_covar
 
 GetDataByClass <- function(data.all, class.value) {
   return(data.all[data.all[, length(data.all)] == class.value, ])
@@ -31,35 +26,6 @@ GetAllAttributes <- function(data.all) {
   return(levels(attributes.factor))
 }
 
-SeparateVisualisation <- function(data.all) {
-  attributes.names <- GetAllAttributes(data.all)
-  plot.list <- list()
-  for (i in 1:length(attributes.names)) {
-    plot <- SingleAttPlot(data.all, attributes.names[i])
-    if (length(plot) > 1 || !is.na(plot)) {
-      plot.list[[length(plot.list) + 1]] <- plot
-    }
-    else {
-      print("Invalid plot at:")
-      print(names(attributes.names)[i])
-      print(plot)
-    }
-  }
-  print("Plots Obtained")
-  n <- length(plot.list)
-  nCol <- floor(sqrt(n))
-  grid_arrange_shared_legend(plot.list)
-}
-
-SingleAttPlot <- function(data.all, attribute.name) {
-  attribute.data <- GetDataByAttribute(data.all, attribute.name)
-  plot <- qplot(data = attribute.data, y = Distance, x = as.numeric(class_values), colour=class_values) + 
-    #geom_text_repel(aes(label = class_values)) + 
-    #theme(axis.text.x=element_text(angle=90, hjust = 1)) + 
-    ggtitle(attribute.name)
-  return(plot)
-}
-
 JointVisualisation <- function(data.all) {
   distance <- data.all$Distance
   class_value <- data.all$class_value
@@ -76,10 +42,27 @@ JointVisualisation <- function(data.all) {
     scale_fill_gradient(low="green", high="red") +
     ggtitle("Conditioned Covariate Drift")
   
-  #plot <- qplot(data = plot.data, x = class_value, y = attributes, colour = distance) +
-    #geom_text_repel(aes(label = attributes)) + 
-  #  ggtitle("Conditioned Covariate Drift")
   return(plot)
 }
 
-## ---- end-of-covar
+PairwiseAttributes <- function(data.att1, data.att2) {
+  class.all <- unique(data.att1[, length(data.att1)])
+  plot.list <- list()
+  for (i in 1:length(class.all)) {
+    data.mono <- GetDataByClass(data.att1, class.all[i])
+    data.dual <- GetDataByClass(data.att2, class.all[i])
+    plot <- RawDataToHeatMap(data.mono, data.dual, class.all[i])
+    if (length(plot) > 1 || !is.na(plot)) {
+      plot.list[[length(plot.list) + 1]] <- plot
+    }
+    else {
+      print("Invalid plot at:")
+      print(names(data1)[i])
+      print(plot)
+    }
+  }
+  print("Plots obtained")
+  grid_arrange_shared_legend(plot.list)
+}
+
+## ---- end-of-cond_covar

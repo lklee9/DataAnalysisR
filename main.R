@@ -23,5 +23,5 @@ HistogramAnalysis <- function(file1, file2=NA){
   Histogram(data.all[[1]], data.all[[2]])
 }
 
-file1 <- "../datasets/train_seed/20130419.arff"
+file1 <- "../datasets/train_seed/20130505.arff"
 file2 <- "../datasets/train_seed/20131129.arff"
