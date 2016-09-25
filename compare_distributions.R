@@ -3,6 +3,7 @@ require(ggrepel)
 library(reshape2)
 library(gridExtra)
 library(grid)
+library(arules)
 source("visualisation.R")
 
 ## ---- compare
@@ -21,10 +22,6 @@ Histogram <- function(data1, data2) {
     }
   }
   print("Plots Obtained")
-  n <- length(plot.list)
-  nCol <- floor(sqrt(n))
-  #do.call(grid.arrange, plot.list)
-  #do.call("grid.arrange", c(plot.list, mylegend, ncol = nCol))
   grid_arrange_shared_legend(plot.list)
 }
 
@@ -45,8 +42,8 @@ SingleHistogram <- function(data1, data2, column.index) {
     else {
       if ((max(data.all[,1]) - min(data.all[,1])) > 0) {
         plot <- ggplot(data.all, aes(value, fill = type)) + 
-          #geom_histogram(alpha = 0.5, position = "identity", binwidth = ((max(data.all[,1]) - min(data.all[,1]))/50))
-          geom_histogram(alpha = 0.5, position = "identity", binwidth = 10)
+          geom_histogram(alpha = 0.5, position = "identity", binwidth = ((max(data.all[,1]) - min(data.all[,1]))/50))
+          #geom_histogram(alpha = 0.5, position = "identity", binwidth = 10)
         plot <- plot + labs(xlab(column.name))
       }
       else {
@@ -56,6 +53,34 @@ SingleHistogram <- function(data1, data2, column.index) {
       }
     }
     return(plot)
+}
+
+ConstructFrequencyMatrix <- function(data.all, attribute.values, class.values) {
+  print("Constructing Frequency Matrix")
+  br <- seq(min(data.all[, 1]), max(data.all[, 1]), (max(data.all[, 1]) - min(data.all[, 1]))/5)
+  matrix.list <- Map(function(x) 
+    hist(data.all[data.all[,2] == x, 1], breaks = br, include.lowest = T, plot = F)$counts, class.values)
+  #for (idx_row in seq(1, nrow(data.all))) {
+  #  i <- match(data.all[idx_row, 1], attribute.values)
+  #  j <- match(data.all[idx_row, 2], class.values)
+  #  matrix.frequency[i, j] <- matrix.frequency[i, j] + 1
+  #}
+  matrix.frequency <- data.frame(matrix.list)
+  return(matrix.frequency)
+}
+
+SinglePosteriorCompare <- function(data.before, data.after, column.index) {
+  data.frame.before <- data.frame(data.before[, column.index], data.before[, ncol(data.before)])
+  data.frame.after <- data.frame(data.after[, column.index], data.after[, ncol(data.after)])
+  
+  attribute.values <- sort(unique(c(as.character(data.frame.before[, 1]), as.character(data.frame.after[, 1]))))
+  class.values <- sort(unique(c(as.character(data.frame.before[, 2]), as.character(data.frame.after[, 2]))))
+  
+  matrix.before <- ConstructFrequencyMatrix(data.frame.before, attribute.values, class.values)
+  matrix.after <- ConstructFrequencyMatrix(data.frame.after, attribute.values, class.values)
+  
+  matrix.difference <- abs(matrix.after - matrix.before)
+  return(matrix.difference)
 }
 
 ## ---- end-of-compare
