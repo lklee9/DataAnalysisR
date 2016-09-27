@@ -7,7 +7,7 @@ output:
     fig_width: 10
     fig_height: 7.5
 params:
-  data_file: "sensor"
+  data_file: "elecNormNew"
 ---
 
 ```{r setup, echo = FALSE}
@@ -67,13 +67,15 @@ Histogram of the data by attributes.
 The raw data of the results will be provided at the end of this document.
 ```{r, include=F}
 <<results>>
-  target_file = "20130505_20131129"
+  #target_file = "20130505_20131129"
   results.prior.1 <- ResultTable(paste("../../data_out/martvard/", params$data_file, "_1-attributes_prior.csv", sep = ""))
   results.prior.2 <- ResultTable(paste("../../data_out/martvard/", params$data_file, "_2-attributes_prior.csv", sep = ""))
+  results.prior.3 <- ResultTable(paste("../../data_out/martvard/", params$data_file, "_3-attributes_prior.csv", sep = ""))
   results.cc.1 <- ResultTable(paste("../../data_out/martvard/", params$data_file, "_1-attributes_ConditionedCovariate.csv", sep = ""))
   results.cc.2 <- ResultTable(paste("../../data_out/martvard/", params$data_file, "_2-attributes_ConditionedCovariate.csv", sep = ""))
   results.pos.1 <- ResultTable(paste("../../data_out/martvard/", params$data_file, "_1-attributes_posterior.csv", sep = ""))
   results.pos.2 <- ResultTable(paste("../../data_out/martvard/", params$data_file, "_2-attributes_posterior.csv", sep = ""))
+  results.pos.3 <- ResultTable(paste("../../data_out/martvard/", params$data_file, "_3-attributes_posterior.csv", sep = ""))
 ```
 
 ### Covariate Drift
@@ -84,8 +86,6 @@ We can verify the correctness of the results by comparing them to the histograms
   <<covar>>
   SingleHistogramVisual(results.prior.1)
 ```
-
------------------------------------------
 
 The following is the covariate results for 2 Attributes.
 This plot is just an exercise on how results from larger amounts of attributes might be visualised.
@@ -113,6 +113,12 @@ However this method only works with 2 attribute tests.
   DualHistogramVisual(results.prior.1, results.prior.2)
 ```
 
+Here is a heatmap for 3 attributes that contains the attribute with the highest variance in difference.
+```{r}
+  TripleCovariateVisual(results.prior.1, results.prior.2, results.prior.3)
+```
+
+----------------------------------------------------------------
 
 ### Conditioned Covaraites (Single Attributes)
 ```{r}
@@ -127,11 +133,13 @@ Gred Values means that the specific class does not occur in the dataset.
   PairwiseAttributes(results.cc.1, results.cc.2)
 ```
 
+--------------------------------------------------------
+
 ### Posterior (1 Attribute)
 ```{r}
-  RawDataToHeatMap(results.pos.1, results.pos.2, "Posterior 2 Attributes")
+  DualHistogramVisual(results.pos.1, results.pos.2, "Posterior")
+  TripleCovariateVisual(results.pos.1, results.pos.2, results.pos.3, "Posterior")
 ```
-
 
 --------------------------------------------------------------------------------
 
