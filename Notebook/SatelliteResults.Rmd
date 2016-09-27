@@ -111,7 +111,7 @@ However this method only works with 2 attribute tests.
   DualHistogramVisual(results.prior.1, results.prior.2)
 ```
 
-Here is a heatmap for 3 attributes that contains the attribute with the highest variance in difference, **brightness**.
+Here is a heatmap for 3 attributes that contains the attribute with the highest variance in difference.
 ```{r}
   TripleCovariateVisual(results.prior.1, results.prior.2, results.prior.3)
 ```
