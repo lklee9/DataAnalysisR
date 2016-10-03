@@ -1,6 +1,7 @@
-require(ggplot2)
-
 ## ---- visualisation
+library(ggplot2)
+library(plotly)
+
 
 MDS <- function(distance_matrix, attributes) {
   fit <- cmdscale(distance_matrix, eig=TRUE, k=2)
@@ -15,7 +16,7 @@ MDS <- function(distance_matrix, attributes) {
   return(plot)
 }
 
-RawDataToHeatMap <- function(data.att1, data.att2, title) {
+RawDataToHeatMap <- function(data.att1, data.att2, title, z_min = NA, z_max = NA) {
   # Construct Single attribute data
   attribute.list <- as.character(data.att1[, length(data.att1) - 1])
   attributes <- sapply(attribute.list, function(x) strsplit(x, "_")[[1]][1])
@@ -27,10 +28,18 @@ RawDataToHeatMap <- function(data.att1, data.att2, title) {
   attributes.2 <- sapply(attribute.list, function(x) strsplit(x, "_")[[1]][2])
   data.dual <- data.frame(data.att2[, 1], attributes.1, attributes.2, stringsAsFactors = FALSE)
   
-  return(HeatMap(data.mono, data.dual, title))
+  if (is.na(z_min)) {
+    z_min <- min(c(data.att1[,1], data.att2[,1]))
+  }
+  
+  if (is.na(z_max)) {
+    z_max <- max(c(data.att1[,1], data.att2[,1]))
+  }
+  
+  return(HeatMap(data.mono, data.dual, title, z_min, z_max))
 }
 
-HeatMap <- function(data.mono, data.dual, title) {
+HeatMap <- function(data.mono, data.dual, title, z_min = 0, z_max = 1) {
   # Format of data 
   #
   #         data.mono                             data.dual
@@ -46,19 +55,28 @@ HeatMap <- function(data.mono, data.dual, title) {
   
   names(plot.data) <- c("distance", "attributes_1", "attributes_2")
   # To change the color of the gradation :
-  plot <- ggplot(plot.data, aes(attributes_1, attributes_2, z= distance)) + 
-    geom_tile(aes(fill = distance)) + 
-    theme_bw() + 
-    #scale_fill_gradient(low="green", high="red", limits=c(0,1)) +
-    scale_fill_gradient(low="green", high="red") +
-    ggtitle(title)
+  #plot <- ggplot(plot.data, aes(attributes_1, attributes_2, z= distance)) + 
+  #  geom_tile(aes(fill = distance)) + 
+  #  theme_bw() + 
+  #  #scale_fill_gradient(low="green", high="red", limits=c(0,1)) +
+  #  scale_fill_gradient(low="green", high="red") +
+  #  ggtitle(title)
+  
+  plot <- plot_ly(plot.data,
+                  x = ~attributes_1, 
+                  y = ~attributes_2, 
+                  z = ~distance, 
+                  zmin = z_min,
+                  zmax = z_max,
+                  colors = colorRamp(c("green", "red")),
+                  width = 1000,
+                  height = 750,
+                  type = "heatmap")
   
   return(plot)
 }
 
 grid_arrange_shared_legend <- function(plots) {
-  n <- length(plots)
-  nCol <- floor(sqrt(n))
   g <- ggplotGrob(plots[[1]] + theme(legend.position="bottom"))$grobs
   legend <- g[[which(sapply(g, function(x) x$name) == "guide-box")]]
   lheight <- sum(legend$height)

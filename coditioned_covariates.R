@@ -36,11 +36,20 @@ JointVisualisation <- function(data.all) {
   names(plot.data) <- c("distance", "class_value", "attributes")
   
   # To change the color of the gradation :
-  plot <- ggplot(plot.data, aes(class_value, attributes, z= distance)) + 
-    geom_tile(aes(fill = distance)) + 
-    theme_bw() + 
-    scale_fill_gradient(low="green", high="red") +
-    ggtitle("Conditioned Covariate Drift")
+  #plot <- ggplot(plot.data, aes(class_value, attributes, z= distance)) + 
+  #  geom_tile(aes(fill = distance)) + 
+  #  theme_bw() + 
+  #  scale_fill_gradient(low="green", high="red") +
+  #  ggtitle("Conditioned Covariate Drift")
+    
+  plot <- plot_ly(plot.data,
+                  x = ~class_value, 
+                  y = ~attributes, 
+                  z = ~distance, 
+                  colors = colorRamp(c("green", "red")),
+                  width = 1000,
+                  height = 750,
+                  type = "heatmap")
   
   return(plot)
 }
@@ -48,10 +57,12 @@ JointVisualisation <- function(data.all) {
 PairwiseAttributes <- function(data.att1, data.att2) {
   class.all <- unique(data.att1[, length(data.att1)])
   plot.list <- list()
+  z_min <- min(data.att1[,1])
+  z_max <- max(data.att1[,1])
   for (i in 1:length(class.all)) {
     data.mono <- GetDataByClass(data.att1, class.all[i])
     data.dual <- GetDataByClass(data.att2, class.all[i])
-    plot <- RawDataToHeatMap(data.mono, data.dual, class.all[i])
+    plot <- RawDataToHeatMap(data.mono, data.dual, class.all[i], z_min, z_max)
     if (length(plot) > 1 || !is.na(plot)) {
       plot.list[[length(plot.list) + 1]] <- plot
     }
@@ -62,7 +73,13 @@ PairwiseAttributes <- function(data.att1, data.att2) {
     }
   }
   print("Plots obtained")
-  grid_arrange_shared_legend(plot.list)
+  
+  n <- length(plot.list)
+  nCol <- ceiling(sqrt(n))
+  g <- layout(subplot(plot.list, nrows = ceiling(n / nCol),
+                      shareX = TRUE, shareY = TRUE),
+              showlegend = FALSE)
+  return(g)
 }
 
 ## ---- end-of-cond_covar
