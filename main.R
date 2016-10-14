@@ -29,7 +29,7 @@ RenderHTML <- function(file1, file2) {
   params.all$file1 <- file1
   params.all$file2 <- file2
   title <- paste0(file1, "_", file2)
-  rmarkdown::render("Notebook/SatelliteResults.Rmd", params = params.all, output_file=paste0(title, '.html'), output_dir = "Notebook/Satellite/")
+  rmarkdown::render("Notebook/SatelliteResults.Rmd", params = params.all, output_file=paste0(title, '.html'), output_dir = "Notebook/Satellite")
 }
 
 RenderAll <- function() {

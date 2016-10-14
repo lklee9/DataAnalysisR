@@ -78,7 +78,7 @@ PairwiseAttributes <- function(data.att1, data.att2) {
   nCol <- ceiling(sqrt(n))
   g <- layout(subplot(plot.list, nrows = ceiling(n / nCol),
                       shareX = TRUE, shareY = TRUE),
-              showlegend = FALSE)
+              showlegend = FALSE, title = paste(class.all, collapse = "_"))
   return(g)
 }
 
