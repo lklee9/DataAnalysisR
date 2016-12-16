@@ -1,5 +1,15 @@
 ## ---- distance_matrix
 
+# Public ----
+
+PlotMDS <- function(data.table) {
+  attributes.all <- ExtractAttributes(resultTable)
+  distance.matrix <- DistanceMatrix(data.table)
+  MDS(distance.matrix, attributes.all)
+}
+
+# Private ----
+
 DistanceMatrix <- function(data.table) {
   attributes <- ExtractAttributes(data.table)
   distanceMatrix <- matrix(0, nrow = length(attributes), ncol = length(attributes))
@@ -23,7 +33,7 @@ getDistToAttPair <- function(data.table) {
   distToAttPair <- Map(
     function(x) Map(
       function(y) Map(
-        function(z) c(data.table$Distance[x], 
+        function(z) c(data.table$drift[x], 
                       match(y, attributes), match(z, attributes)), 
         strsplit(data.attributes[x], "_")[[1]]
         ),
