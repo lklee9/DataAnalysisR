@@ -1,6 +1,8 @@
 ## ---- visualisation
 library(ggplot2)
 library(plotly)
+library(RColorBrewer)
+library(circlize)
 
 
 MDS <- function(distance_matrix, attributes) {
@@ -18,12 +20,12 @@ MDS <- function(distance_matrix, attributes) {
 
 RawDataToHeatMap <- function(data.att1, data.att2, title, z_min = NA, z_max = NA) {
   # Construct Single attribute data
-  attribute.list <- as.character(data.att1[, length(data.att1) - 1])
+  attribute.list <- as.character(data.att1[, length(data.att1)])
   attributes <- sapply(attribute.list, function(x) strsplit(x, "_")[[1]][1])
   data.mono <- data.frame(data.att1[, 1], attributes, stringsAsFactors = FALSE)
   
   # Construct Pairwise attibute data
-  attribute.list <- as.character(data.att2[, length(data.att2) - 1])
+  attribute.list <- as.character(data.att2[, length(data.att2)])
   attributes.1 <- sapply(attribute.list, function(x) strsplit(x, "_")[[1]][1])
   attributes.2 <- sapply(attribute.list, function(x) strsplit(x, "_")[[1]][2])
   data.dual <- data.frame(data.att2[, 1], attributes.1, attributes.2, stringsAsFactors = FALSE)
@@ -35,7 +37,6 @@ RawDataToHeatMap <- function(data.att1, data.att2, title, z_min = NA, z_max = NA
   if (is.na(z_max)) {
     z_max <- max(c(data.att1[,1], data.att2[,1]))
   }
-  
   return(HeatMap(data.mono, data.dual, title, z_min, z_max))
 }
 
@@ -54,13 +55,16 @@ HeatMap <- function(data.mono, data.dual, title, z_min = 0, z_max = 1) {
   plot.data <- data.frame(distances, attributes.first, attributes.second)
   
   names(plot.data) <- c("distance", "attributes_1", "attributes_2")
-  # To change the color of the gradation :
-  #plot <- ggplot(plot.data, aes(attributes_1, attributes_2, z= distance)) + 
-  #  geom_tile(aes(fill = distance)) + 
-  #  theme_bw() + 
-  #  #scale_fill_gradient(low="green", high="red", limits=c(0,1)) +
-  #  scale_fill_gradient(low="green", high="red") +
-  #  ggtitle(title)
+  col <- colorRamp2(c(z_min, z_max), c("green", "red"))
+  
+  # Create Color Scale
+  print(plot.data[, 1])
+  vals <- unique(plot.data[, 1])
+  o <- order(vals, decreasing = FALSE)
+  cols <- scales::col_numeric(c("green", "red"), domain = c(z_min, z_max))(vals)
+  colz <- setNames(data.frame(vals[o], cols[o]), NULL)
+  print(cols)
+  print(colz)
   
   plot <- plot_ly(plot.data,
                   x = ~attributes_1, 
@@ -68,7 +72,8 @@ HeatMap <- function(data.mono, data.dual, title, z_min = 0, z_max = 1) {
                   z = ~distance, 
                   zmin = z_min,
                   zmax = z_max,
-                  colors = colorRamp(c("green", "red")),
+                  #colors = colorRamp(c("green", "red")),
+                  colorscale = colz,
                   width = 1000,
                   height = 750,
                   type = "heatmap")

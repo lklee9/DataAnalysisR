@@ -22,13 +22,14 @@ library(reshape2)
 library(gridExtra)
 library(grid)
 library(foreign)
-read_chunk("../read_data.R")
-read_chunk("../result_table.R")
-read_chunk("../distance_matrix.R")
+read_chunk("../visualise_results/result_table.R")
+read_chunk("../visualise_results/mds.R")
 read_chunk("../visualisation.R")
-read_chunk("../compare_distributions.R")
-read_chunk("../coditioned_covariates.R")
-read_chunk("../covariates.R")
+read_chunk("../visualise_results/heatmaps.R")
+read_chunk("../visualise_results/detailed_likelihood.R")
+read_chunk("../visualise_results/detailed_posterior.R")
+read_chunk("../verification/read_data.R")
+read_chunk("../verification/compare_distributions.R")
 ```
 
 
@@ -68,14 +69,38 @@ Histogram of the data by attributes.
 The raw data of the results will be provided at the end of this document.
 ```{r, include=F}
 <<results>>
-  results.prior.1 <- ResultTable(paste0("../../data_out/martvard/", params$file1, "_", params$file2, "_1-attributes_prior.csv"))
-  results.prior.2 <- ResultTable(paste0("../../data_out/martvard/", params$file1, "_", params$file2, "_2-attributes_prior.csv"))
-  results.prior.3 <- ResultTable(paste0("../../data_out/martvard/", params$file1, "_", params$file2, "_3-attributes_prior.csv"))
-  results.cc.1 <- ResultTable(paste0("../../data_out/martvard/", params$file1, "_", params$file2, "_1-attributes_ConditionedCovariate.csv"))
-  results.cc.2 <- ResultTable(paste0("../../data_out/martvard/", params$file1, "_", params$file2, "_2-attributes_ConditionedCovariate.csv"))
-  results.pos.1 <- ResultTable(paste0("../../data_out/martvard/", params$file1, "_", params$file2, "_1-attributes_posterior.csv"))
-  results.pos.2 <- ResultTable(paste0("../../data_out/martvard/", params$file1, "_", params$file2, "_2-attributes_posterior.csv"))
-  results.pos.3 <- ResultTable(paste0("../../data_out/martvard/", params$file1, "_", params$file2, "_3-attributes_posterior.csv"))
+  results.prior.1 <- ResultTable(paste0("../../data_out/train_seed/",
+                                        params$file1, "_", params$file2, "/FrequencyMaps/",
+                                        params$file1, "_", params$file2, "_1-attributes_covariate.csv"))
+  results.prior.2 <- ResultTable(paste0("../../data_out/train_seed/", 
+                                        params$file1, "_", params$file2, "/FrequencyMaps/",
+                                        params$file1, "_", params$file2, "_2-attributes_covariate.csv"))
+  results.prior.3 <- ResultTable(paste0("../../data_out/train_seed/", 
+                                        params$file1, "_", params$file2, "/FrequencyMaps/",
+                                        params$file1, "_", params$file2, "_3-attributes_covariate.csv"))
+  results.cc.1 <- ResultTable(paste0("../../data_out/train_seed/", 
+                                     params$file1, "_", params$file2, "/FrequencyMaps/",
+                                     params$file1, "_", params$file2, "_1-attributes_likelihood.csv"))
+  results.cc.2 <- ResultTable(paste0("../../data_out/train_seed/", 
+                                     params$file1, "_", params$file2, "/FrequencyMaps/",
+                                     params$file1, "_", params$file2, "_2-attributes_likelihood.csv"))
+  results.cc.detailed.1 <- ResultTable(paste0("../../data_out/train_seed/", 
+                                              params$file1, "_", params$file2, "/FrequencyMaps/",
+                                              params$file1, "_", params$file2,
+                                              "_1-attributes_likelihood_detailed.csv"))
+  results.cc.detailed.2 <- ResultTable(paste0("../../data_out/train_seed/", 
+                                              params$file1, "_", params$file2, "/FrequencyMaps/",
+                                              params$file1, "_", params$file2, 
+                                              "_2-attributes_likelihood_detailed.csv"))
+  results.pos.1 <- ResultTable(paste0("../../data_out/train_seed/", 
+                                      params$file1, "_", params$file2, "/FrequencyMaps/",
+                                      params$file1, "_", params$file2, "_1-attributes_posterior.csv")) 
+  results.pos.2 <- ResultTable(paste0("../../data_out/train_seed/",  
+                                      params$file1, "_", params$file2, "/FrequencyMaps/",
+                                      params$file1, "_", params$file2, "_2-attributes_posterior.csv"))
+  results.pos.3 <- ResultTable(paste0("../../data_out/train_seed/", 
+                                      params$file1, "_", params$file2, "/FrequencyMaps/",
+                                      params$file1, "_", params$file2, "_3-attributes_posterior.csv"))
 ```
 
 -------------------------------------------
@@ -85,52 +110,40 @@ The following is the results for a test of 1 Attribute.
 We can verify the correctness of the results by comparing them to the histograms of the attributes above.
 
 ```{r}
-  <<covar>>
-  SingleHistogramVisual(results.prior.1)
+  #TODO: Use proper arguments
+  <<heatmaps>>
+  VisualSingleAttribute(results.prior.1, "Covariate")
 ```
 
-The following is the covariate results for 2 Attributes.
-This plot is just an exercise on how results from larger amounts of attributes might be visualised.
-
-The plot is made by first constructing a "distance matrix" where the distance obtained for each pair of attribute is represneted.
-
 ```{r}
-<<distance_matrix>>
-  attributes.all <- ExtractAttributes(results.prior.2)
-  distanceMatrix <- DistanceMatrix(results.prior.2)
-  print(distanceMatrix)
-```
-
-This matrix is then plotted using Multidimensional Scaling to visualise the distances in the matrix.
-The final plot will then plot attributes that have a higher dirft together further apart.
-
-```{r}
-  MDS(distanceMatrix, attributes.all)
-```
-
-We can also plot the distance matrix as a heatmap to directly view the results. 
-However this method only works with 2 attribute tests.
-
-```{r}
-  DualHistogramVisual(results.prior.1, results.prior.2)
+  VisualPairAttributes(results.prior.1, results.prior.2, drift.type = "Covariate")
 ```
 
 Here is a heatmap for 3 attributes that contains the attribute with the highest variance in difference.
 ```{r}
-  TripleCovariateVisual(results.prior.1, results.prior.2, results.prior.3)
+  VisualTripleAttributes(results.prior.1, results.prior.2, results.prior.3, drift.type = "Covariate")
 ```
 
 --------------------------------------------------
 
-### Conditioned Covaraites (Single Attributes)
+### Likelihood (Single Attributes)
 ```{r}
-<<cond_covar>>
-  JointVisualisation(results.cc.1)
+  VisualSingleAttribute(results.cc.1, drift.type = "Likelihood")
 ```
 
-### Conditioned Covaraites (Pair Attributes)
+### Likelihood (Pair Attributes)
 ```{r, fig.width = 15, fig.height=15}
-  PairwiseAttributes(results.cc.1, results.cc.2)
+  VisualPairAttributes(results.cc.1, results.cc.2, drift.type = "Likelihood")
+```
+
+### Detailed Likelihood (Single Attributes)
+```{r}
+  VisualSingleLikelihoodAttribute(results.cc.detailed.1)
+```
+
+### Detailed Likelihood (Pair Attributes)
+```{r, fig.width = 15, fig.height=15}
+  VisualPairLikelihoodAttributes(results.cc.detailed.1, results.cc.detailed.2)
 ```
 
 ---------------------------------------------------------------------------------------------------
@@ -138,12 +151,52 @@ Here is a heatmap for 3 attributes that contains the attribute with the highest 
 ### Posterior (1 Attribute)
 
 ```{r}
-  DualHistogramVisual(results.pos.1, results.pos.2, "Posterior")
-  TripleCovariateVisual(results.pos.1, results.pos.2, results.pos.3, "Posterior")
+  VisualPairAttributes(results.pos.1, results.pos.2, drift.type = "Posterior")
+  VisualTripleAttributes(results.pos.1, results.pos.2, results.pos.3, drift.type = "Posterior")
 ```
 
-
 --------------------------------------------------------------------------------
+
+### Comparing Results
+```{r, include=F}
+  results.new.prior.1 <- ResultTable(paste0("../../data_out/train_seed/", 
+                                            "20131113", "_", params$file2, "/FrequencyMaps/", 
+                                            "20131113", "_", params$file2, "_1-attributes_covariate.csv"))
+  results.new.prior.2 <- ResultTable(paste0("../../data_out/train_seed/", 
+                                            "20131113", "_", params$file2, "/FrequencyMaps/", 
+                                            "20131113", "_", params$file2, "_2-attributes_covariate.csv"))
+  results.new.cc.1 <- ResultTable(paste0("../../data_out/train_seed/", 
+                                            "20131113", "_", params$file2, "/FrequencyMaps/", 
+                                         "20131113", "_", params$file2, "_1-attributes_likelihood.csv"))
+  results.new.cc.2 <- ResultTable(paste0("../../data_out/train_seed/", 
+                                            "20131113", "_", params$file2, "/FrequencyMaps/", 
+                                         "20131113", "_", params$file2, "_2-attributes_likelihood.csv"))
+  results.new.cc.detailed.1 <- ResultTable(paste0("../../data_out/train_seed/", 
+                                            "20131113", "_", params$file2, "/FrequencyMaps/", 
+                                                  "20131113", "_", params$file2,
+                                                  "_1-attributes_likelihood_detailed.csv"))
+  results.new.pos.1 <- ResultTable(paste0("../../data_out/train_seed/", 
+                                            "20131113", "_", params$file2, "/FrequencyMaps/", 
+                                          "20131113", "_", params$file2, "_1-attributes_posterior.csv"))
+  results.new.pos.2 <- ResultTable(paste0("../../data_out/train_seed/", 
+                                            "20131113", "_", params$file2, "/FrequencyMaps/", 
+                                          "20131113", "_", params$file2, "_2-attributes_posterior.csv"))
+```
+
+#### Comparing Covaraite Drift between *20130505 - 20131129* and *20131113 - 20131129*:
+```{r}
+  compareResults(list(results.prior.1, results.prior.2), list(results.new.prior.1, results.new.prior.2))
+```
+
+#### Comparing Likelihood Drift between *20130505 - 20131129* and *20131113 - 20131129*:
+```{r}
+  compareResults(list(results.cc.1, results.cc.2), list(results.new.cc.1, results.new.cc.2))
+```
+
+#### Comparing Posterior Drift between *20130505 - 20131129* and *20131113 - 20131129*:
+```{r}
+  compareResults(list(results.pos.1, results.pos.2), list(results.new.pos.1, results.new.pos.2))
+```
 
 ## Raw Data
 https://github.com/LeeLoongKuan/DriftMapper/tree/master/data_out/martvard

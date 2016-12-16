@@ -1,21 +1,21 @@
-source("distance_matrix.R")
+source("visualise_results/mds.R")
 source("visualisation.R")
-source("result_table.R")
-source("read_data.R")
-source("compare_distributions.R")
+source("visualise_results/result_table.R")
+source("verification/read_data.R")
+source("verification/compare_distributions.R")
 library(knitr)  
 
 
 #file_path = "../data_out/martvard/airlines_4-attributes_prior.csv"
-file_path = "../data_out/martvard/20130622_20131129_4-attributes_prior.csv"
+file.1 = "../data_out/FrequencyMaps/20130505_20131129/20130505_20131129_1-attributes_covariate.csv"
+file.2 = "../data_out/FrequencyMaps/20130505_20131129/20130505_20131129_2-attributes_covariate.csv"
 #file_path = "../data_out/martvard/elecNormNew_4-attributes_prior.csv"
 #file_path = "../data_out/martvard/sensor_4-attributes_prior.csv"
 
-runVisualisation <- function(file_path) {
-  resultTable <- ResultTable(file_path)
-  attributes.all <- ExtractAttributes(resultTable)
-  distanceMatrix <- DistanceMatrix(resultTable)
-  MDS(distanceMatrix, attributes.all)
+runVisualisation <- function(file.1, file.2) {
+  result.1 <- ResultTable(file.1)
+  result.2 <- ResultTable(file.2)
+  DualHistogramVisual(file.1, file.2)
 }
 
 require(foreign)
@@ -41,5 +41,7 @@ RenderAll <- function() {
   RenderHTML("20131113", "20131129")
 }
 
-file1 <- "../datasets/train_seed/20130505.arff"
-file2 <- "../datasets/train_seed/20131129.arff"
+#file1 <- "../datasets/train_seed/20130505.arff"
+#file2 <- "../datasets/train_seed/20131129.arff"
+#runVisualisation(file.1, file.2)
+RenderHTML("20130505", "20131129")
