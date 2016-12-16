@@ -1,8 +1,8 @@
 library(plotly)
 file.pos <- "../data_out/synthetic_5Att_5Val/n1000000_m0.7_posterior/stream/POSTERIOR_5000.csv"
 
-PlotAllWindowSizes <- function(drift.type, directory, column.indcies) {
-  files.all <- list.files(path = directory, pattern = drift.type)
+PlotAllWindowSizes <- function(drift.type, subset.length, directory, column.indcies) {
+  files.all <- list.files(path = directory, pattern = paste0(drift.type, "_.*_", subset.length))
   window.sizes <- sapply(files.all, function(x) as.integer(strsplit(x, "[_.]")[[1]][2]))
   files.all <- files.all[order(window.sizes, files.all)]
   window.sizes <- sort(window.sizes)
