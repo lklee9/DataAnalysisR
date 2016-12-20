@@ -44,4 +44,16 @@ RenderAll <- function() {
 #file1 <- "../datasets/train_seed/20130505.arff"
 #file2 <- "../datasets/train_seed/20131129.arff"
 #runVisualisation(file.1, file.2)
-RenderHTML("20130505", "20131129")
+##RenderHTML("20130505", "20131129")
+
+RenderDriftTimeline <- function(folder, subset.length) {
+  params.all <- list()
+  params.all$result.folder <- folder
+  params.all$subset.length <- subset.length
+
+  rmarkdown::render("Notebook/DriftTimeline.Rmd", params = params.all, 
+                    output_file=paste0(folder, "_", subset.length, '.html'), 
+                    output_dir = "Notebook/DriftTimeline")
+}
+
+
