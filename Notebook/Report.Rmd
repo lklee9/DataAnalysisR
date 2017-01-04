@@ -2,10 +2,6 @@
 title: "End Year Report"
 author: "Loong Kuan"
 date: "16 September 2016"
-params:
-  result.folder: "elecNormNew"
-  subset.length: 1
-knit: (function(inputFile, encoding) {rmarkdown::render(inputFile, encoding = encoding, output_file = paste0(params$result.folder, "_", params$subset.length,'.html'))})
 ---
 
 ```{r setup, echo = FALSE}
@@ -23,19 +19,4 @@ read_chunk("../drift_timeline/plot.R")
 ```
 
 
-Plotting for attribute subset of length:
-```{r length}
-print(params$subset.length)
-```
-For data set:
-``` {r dataset}
-print(params$result.folder)
-```
-<drift_timeline>
-```{r plot}
-folder <- paste0("../../data_out/", params$result.folder, "/stream")
-PlotAllWindowSizes("COVARIATE", params$subset.length, folder, c())
-PlotAllWindowSizes("JOINT", params$subset.length, folder, c())
-PlotAllWindowSizes("LIKELIHOOD", params$subset.length, folder, c())
-PlotAllWindowSizes("POSTERIOR", params$subset.length, folder, c())
-```
+
