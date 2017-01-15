@@ -3,8 +3,8 @@ require(ggrepel)
 library(reshape2)
 library(gridExtra)
 library(grid)
-source("visualisation.R")
-source("visualise_results/heatmaps.R")
+#source("visualisation.R")
+#source("visualise_results/heatmaps.R")
 
 ## ---- likelihood
 

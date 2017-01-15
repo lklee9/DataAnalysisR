@@ -14,21 +14,39 @@ PlotAllWindowSizes <- function(drift.type, subset.length, directory, column.indc
   if (length(column.indcies) == 0) column.indcies <- (3:(ncol(data.list[[1]])))
   plot.list <- lapply(seq(1:length(data.list)), 
                       function(x) 
-                        PlotDriftTimeline(data.list[[x]][, unique(c(1,2,column.indcies))], window.sizes[x]))
+                        PlotDriftTimeline(data.list[[x]][, unique(c(1,2,column.indcies))], 
+                                          window.sizes[x], 900, 200 * length(data.list)))
   
   g <- layout(subplot(plot.list, nrows = length(plot.list), shareX = TRUE, shareY = TRUE),
               showlegend = TRUE, 
               title = paste(drift.type)) %>%
     layout(
       annotations = list(
-      list(x = 1.14 , y = 1.03, text = "Window Sizes", showarrow = F, xref='paper', yref='paper')))
+      list(x = 1.235 , y = 1.08, text = "Window Sizes - Attribute", showarrow = F, xref='paper', yref='paper')))
       
   return(g)
 }
 
-PlotDriftTimeline <- function(drift.timeline, window.size) {
+PlotWindowSize <- function(drift.type, window.length, subset.length, directory, column.indcies) {
+  window.length <- as.integer(window.length)
+  file.name <- list.files(path = directory, pattern = paste0(drift.type, "_", window.length, "_", subset.length))[1]
+  
+  print(file.name)
+  drift.timeline <- GetDriftTimeline(paste0(directory, "/", file.name))
+  if (length(column.indcies) == 0) column.indcies <- (3:(ncol(drift.timeline)))
+  
+  timeline.plot <- PlotDriftTimeline(drift.timeline, window.length, 900, 200) %>%
+    layout(showlegend = TRUE, title = paste(drift.type, window.length)) %>%
+    layout(
+      annotations = list(
+      list(x = 1.235 , y = 1.08, text = "Window Sizes - Attribute", showarrow = F, xref='paper', yref='paper')))
+      
+  return(timeline.plot)
+}
+
+PlotDriftTimeline <- function(drift.timeline, window.size, width, height) {
   col.names <- names(drift.timeline)
-  p <- plot_ly(drift.timeline, x = ~points, y = drift.timeline[, 2], width = 1000, height = 510,
+  p <- plot_ly(drift.timeline, x = ~points, y = drift.timeline[, 2], width = width, height = height,
                name = paste(window.size, names(drift.timeline)[2]), type = "scatter", mode = "lines")
   if (ncol(drift.timeline) > 2) {
     for (i in 3:ncol(drift.timeline)) {

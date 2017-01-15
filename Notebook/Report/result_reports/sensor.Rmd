@@ -1,0 +1,16 @@
+---
+title: "sensor Results"
+author: "Loong Kuan"
+date: "13 January 2017"
+---
+
+```{r setup, echo = FALSE, message = FALSE}
+source("../../../drift_timeline/timeline.R")
+```
+
+```{r electricity, echo = FALSE, message = FALSE, warning = FALSE}
+PlotAllWindowSizes("COVARIATE", 1, "../../../../data_out/sensor/stream/", c())
+PlotAllWindowSizes("LIKELIHOOD", 1, "../../../../data_out/sensor/stream/", c())
+PlotAllWindowSizes("POSTERIOR", 1, "../../../../data_out/sensor/stream/", c())
+PlotAllWindowSizes("JOINT", 1, "../../../../data_out/sensor/stream/", c())
+```

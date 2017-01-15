@@ -1,0 +1,62 @@
+---
+title: "Electricity Results"
+author: "Loong Kuan"
+date: "13 January 2017"
+---
+
+```{r setup, echo = FALSE, message = FALSE}
+source("../../../drift_timeline/timeline.R")
+source("../../../visualisation.R")
+source("../../../visualise_results/result_table.R")
+source("../../../visualise_results/heatmaps.R")
+source("../../../visualise_results/detailed_likelihood.R")
+source("../../../visualise_results/detailed_posterior.R")
+```
+
+In this dataset, 48 instances represents all the data within a day, and therefore, 336 represents a week and 1461 instances roughly represents a month.
+
+```{r electricity, echo = FALSE, message = FALSE, warning = FALSE}
+PlotAllWindowSizes("COVARIATE", 1, "../../../../data_out/elecNormNew/stream/", c())
+PlotAllWindowSizes("LIKELIHOOD", 1, "../../../../data_out/elecNormNew/stream/", c())
+PlotAllWindowSizes("POSTERIOR", 1, "../../../../data_out/elecNormNew/stream/", c())
+PlotAllWindowSizes("JOINT", 1, "../../../../data_out/elecNormNew/stream/", c())
+```
+
+One thing to note from the `Posterior` graph (window size 336) above is that at some points 
+the drift measured over just single attributes seems to be greater than the drift measured over all attributes.
+I'm still trying to figure out the reason for this as this seems to only occur 
+when measuring the posterior drift over small window sizes.
+
+Furthermore, there seems to be an event at point `17532` that caused large drifts in the `vicprice`, `vicdemand`, and `transfer` attributes.
+Therefore, it will make most sense to analyse the drift between data before and after this point.
+
+```{r detail, echo = FALSE}
+results.pos.1 <- ResultTable(paste0("../../../../data_out/elecNormNew/analyse/1-attributes_posterior_detailed.csv"))
+results.pos.2 <- ResultTable(paste0("../../../../data_out/elecNormNew/analyse/2-attributes_posterior_detailed.csv"))
+results.like.1 <- ResultTable(paste0("../../../../data_out/elecNormNew/analyse/1-attributes_likelihood_detailed.csv"))
+results.like.2 <- ResultTable(paste0("../../../../data_out/elecNormNew/analyse/2-attributes_likelihood_detailed.csv"))
+```
+
+### Detailed Likelihood (Single Attributes)
+```{r, echo = FALSE}
+  VisualSingleLikelihoodAttribute(results.like.1)
+```
+
+As expected `vicprice`, `vicdemand`, and `transfer` had the greatest `Likelihood` drift possibly due to their high `Covariate` drift.
+
+The medium `Likelihood` drift of `nswprice` is also expected due to its `Covariate` drift.
+However, the `Likelihood` of `nswprice` drift given the 2 classes have a 
+possibily significant difference between each other.
+This difference probability means that the `Covariate` drift of `nswprice` affected the distribution given the class `DOWN` more that the class `UP`.
+
+### Detailed Posterior (Single Attributes)
+```{r, echo = FALSE}
+  VisualSingleAttributeStructure(results.pos.1, "posterior")
+```
+
+From the Detailed Posterior figure, we can observe that most of the posterior drift is from the attributes `transfer` and `vicdemand`.
+
+For the continous attribute `transfer`, the values that drift the most are the extreme low and higher values 
+indicating that the class distribution given these values has changed significantly.
+
+Similarly for the continous attribute `vicdemand`, most of the posterior drift occurs on the larger values of the attribute also indicating the change in class distribution give these attribute values.

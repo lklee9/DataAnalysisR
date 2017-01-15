@@ -4,7 +4,7 @@ require(plotly)
 #library(reshape2)
 #library(gridExtra)
 #library(grid)
-source("visualisation.R")
+#source("visualisation.R")
 
 ## ---- posterior
 
