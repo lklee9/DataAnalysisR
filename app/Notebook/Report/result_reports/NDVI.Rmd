@@ -1,0 +1,55 @@
+---
+title: "Satellite NDVI Results"
+author: "Loong Kuan"
+date: "13 January 2017"
+---
+
+```{r setup, echo = FALSE, message = FALSE}
+library(foreign)
+source("../../../core/drift_timeline/timeline.R")
+source("../../../core/visualisation.R")
+source("../../../core/visualise_results/result_table.R")
+source("../../../core/visualise_results/heatmaps.R")
+source("../../../core/visualise_results/detailed_likelihood.R")
+source("../../../core/visualise_results/detailed_posterior.R")
+source("../../../core/verification/compare_distributions.R")
+```
+
+In this dataset, multiple instances are given for each day with only a couple days given for each month.
+
+```{r electricity, echo = FALSE, message = FALSE, warning = FALSE}
+PlotAllWindowSizes("COVARIATE", 1, "../../../../../data_out/SITS_2006_NDVI_C/SITS1M_fold1_TEST/moving_chunk/", c())
+PlotAllWindowSizes("LIKELIHOOD", 1, "../../../../../data_out/SITS_2006_NDVI_C/SITS1M_fold1_TEST/moving_chunk/", c())
+PlotAllWindowSizes("POSTERIOR", 1, "../../../../../data_out/SITS_2006_NDVI_C/SITS1M_fold1_TEST/moving_chunk/", c())
+PlotAllWindowSizes("JOINT", 1, "../../../../../data_out/SITS_2006_NDVI_C/SITS1M_fold1_TEST/moving_chunk/", c())
+```
+
+In general there are 2 large spikes of drift in the data at point `1,200,000` and `3,400,000`. These 2 points corresponds to the 5th of June and the 12th of September respectively.
+
+```{r detail, echo = FALSE}
+results.pos.1 <- ResultTable(paste0("../../../../../data_out/SITS_2006_NDVI_C/SITS1M_fold1_TEST/analyse/1-attributes_posterior_detailed.csv"))
+results.like.1 <- ResultTable(paste0("../../../../../data_out/SITS_2006_NDVI_C/SITS1M_fold1_TEST/analyse/1-attributes_likelihood_detailed.csv"))
+```
+
+### Detailed Likelihood (5th June)
+```{r, echo = FALSE}
+  VisualSingleLikelihoodAttribute(results.like.1)
+```
+
+### Detailed Posterior (5th June)
+```{r, echo = FALSE}
+  VisualSingleAttributeStructure(results.pos.1, "posterior")
+```
+
+### Comparing distributions at 5th June and 12th September
+#### During 5th June
+```{r, echo = FALSE} 
+data.all <- read.arff("../../../../../datasets/SITS_2006_NDVI_C/SITS1M_fold1_TEST.arff")
+data.all <- data.all[, c(2,3)]
+Histogram(data.all[seq(800001,1100000),], data.all[seq(1100001,1400000),])
+````
+
+#### During 12th September
+```{r, echo = FALSE} 
+Histogram(data.all[seq(3100001,3300000),], data.all[seq(3300001,3500000),])
+````
