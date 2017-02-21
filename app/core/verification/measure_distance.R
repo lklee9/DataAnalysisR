@@ -1,10 +1,21 @@
+require(ggplot2)
 
 ConstructFrequencyMatrix <- function(data.raw, attribute.index, class.values, bins) {
   data.all <- data.frame(data.raw[, attribute.index], data.raw[, ncol(data.raw)])
-  matrix.list <- Map(function(x) 
-    hist(data.all[data.all[,2] == x, 1], breaks = bins, include.lowest = T, plot = F)$counts, class.values)
-  matrix.frequency <- data.frame(matrix.list)
+  if (length(bins) == 1) {
+    bins <- EqualFreqBreaks(data.raw, attribute.index, bins)
+  }
+  freq.list <- lapply(class.values, 
+                      function(x) as.numeric(hist(data.all[data.all[,2] == x, 1], breaks = bins, include.lowest = T, plot = F)$counts))
+  
+  matrix.frequency <- data.frame(freq.list)
+  names(matrix.frequency) <- class.values
+  matrix.frequency <- t(matrix.frequency)
   return(matrix.frequency)
+}
+
+EqualFreqBreaks <- function(data.all, column.index, bins.count) {
+    return(ggplot2:::breaks(data.all[, column.index], "n", n = bins.count))
 }
 
 SingleLikelihoodDistance <- function(data.before, data.after, column.index) {

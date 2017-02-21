@@ -1,0 +1,59 @@
+<h1 id="spectra-analysis-tool-overview">Spectra Analysis Tool Overview</h1>
+
+<hr>
+
+<h1 id="introduction">Introduction</h1>
+
+<p>The purpose of this tool is to aid in the development of spectroscopy machines. This is achieved by allowing the analysis multiple spectra from different (or even same) stages of development of the machine.</p>
+
+<p>However, this tool can be used to generally analyse any “time-series” data the user wishes. The type of “time-series” data this software can handle is one where the “x-values” are just numeric values that can be logically sorted in ascending order with a single “y-value” assigned to each “x-value”. A simple example of a “time-series” data would be just some reading (y-value) measured on each wavelength (x-value).</p>
+
+<hr>
+
+
+
+<h1 id="data-selection">Data Selection</h1>
+
+<p>The is the “homepage” of the app and contains controls to load data from either a set of <code>SQLite</code> database files or <code>.csv</code> files. In order to use the functionality of any other pages, data must be loaded first.</p>
+
+<hr>
+
+<h1 id="tests-overview">Tests Overview</h1>
+
+<p>This page aims to visualise difference between the tests selected using a method known as Classic Multidimensional Scaling (MDS). Classic MDS takes data in a high-dimensional space and visualises their (euclidean) distance in a lower number of dimensions (2 in this case) <a href="#fn:mds" id="fnref:mds" title="See footnote" class="footnote">1</a>. This will hopefully allow for more focused analysis to be done on the tests.</p>
+
+<p>The purpose of this page would be to see how different tests or rows in the data are and identify interesting groups of tests or rows of data to further analyse and compare against each other.</p>
+
+<hr>
+
+
+
+<h1 id="compare-spectra">Compare Spectra</h1>
+
+<p>Gives functionality to compare and analyse a query group of data against a base group of data. Contains 2 graphs, <strong>“Base and Query Time-Series Data”“</strong> and <strong>“Analysis of Query Time Series data”</strong>, on top of one another.</p>
+
+<p>The main purpose of this page is to allow the user to figure out how do 2 different (or even overlapping) groups of data differ from each other specifically.</p>
+
+
+
+<h2 id="base-and-query-time-series-data">Base and Query Time-Series data</h2>
+
+<p>This simple graph plots the average value of the base and query group data over the time series. This allows the user to see how the 2 data groups differ at each point of the time series.</p>
+
+
+
+<h2 id="analysis-of-query-time-series-data">Analysis of Query Time Series data</h2>
+
+<p>This graph allows the user to select the type of values to assign to the y-value and weights at each data point in the time series. The type of values the user can choose from are: <em>p-value</em>, <em>standard deviation</em>, and <em>outlier score</em>.</p>
+
+<hr>
+
+
+
+<h1 id="view-spectra">View Spectra </h1>
+
+<p>Simple plotter that just plots selected spectra individually on the same graph. Can be used to purely compare the values of 2 or more spectra against one another with no averaging.</p>
+
+<p>The main purpose of this page is a fail safe in case the analysis from the previous pages were unclear and manual analysis is needed.</p>
+
+<div class="footnotes"><hr><ol><li id="fn:mds">Borg, I., &amp; Groenen, P. J. (2005). Modern multidimensional scaling: Theory and applications. Springer Science &amp; Business Media. <a href="#fnref:mds" title="Return to article" class="reversefootnote">↩</a></li></ol></div>

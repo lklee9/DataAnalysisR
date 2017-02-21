@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>User Documentation</title>
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
+</head>
+<body><div class="container"><p><div class="toc">
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#data-selection">Data Selection</a><ul>
+<li><a href="#loading-data-from-a-sqlite-database">Loading data from a SQLite database</a></li>
+<li><a href="#loading-data-from-csv-files">Loading data from CSV files</a></li>
+<li><a href="#data-format">Data Format</a><ul>
+<li><a href="#sqlite-database-format">SQLite Database Format</a><ul>
+<li><a href="#table-calculateddatatable">TABLE: CalculatedDataTable</a></li>
+<li><a href="#table-metadatatable">TABLE: MetaDataTable</a></li>
+</ul>
+</li>
+<li><a href="#csv-files-format">CSV Files Format</a><ul>
+<li><a href="#file-timeseriesdata">FILE: (time.series)_data</a></li>
+<li><a href="#file-timeseriesmetadata">FILE: (time.series)_metadata</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#page-interface">Page Interface</a></li>
+</ul>
+</li>
+<li><a href="#tests-overview">Tests Overview</a><ul>
+<li><a href="#page-interface-1">Page Interface</a></li>
+</ul>
+</li>
+<li><a href="#compare-spectra">Compare Spectra</a><ul>
+<li><a href="#base-and-query-time-series-data">Base and Query Time-Series data</a></li>
+<li><a href="#analysis-of-query-time-series-data">Analysis of Query Time Series data</a><ul>
+<li><a href="#p-value">p-value</a></li>
+<li><a href="#standard-deviation">Standard Deviation</a></li>
+<li><a href="#outlier-score">Outlier Score</a></li>
+</ul>
+</li>
+<li><a href="#page-interface-2">Page Interface</a></li>
+</ul>
+</li>
+<li><a href="#view-spectra">View Spectra </a><ul>
+<li><a href="#page-interface-3">Page Interface</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</p>
+
+<hr>
+
+
+
+<h1 id="introduction">Introduction</h1>
+
+<p>The purpose of this tool is to aid in the development of spectroscopy machines. This is achieved by allowing the analysis multiple spectra from different (or even same) stages of development of the machine.</p>
+
+<p>However, this tool can be used to generally analyse any “time-series” data the user wishes. The type of “time-series” data this software can handle is one where the “x-values” are just numeric values that can be logically sorted in ascending order with a single “y-value” assigned to each “x-value”. A simple example of a “time-series” data would be just some reading (y-value) measured on each wavelength (x-value).</p>
+
+<hr>
+
+
+
+<h1 id="data-selection">Data Selection</h1>
+
+<p>The is the “homepage” of the app and contains controls to load data from either a set of <code>SQLite</code> database files or <code>.csv</code> files. In order to use the functionality of any other pages, data must be loaded first.</p>
+
+<hr>
+
+<h2 id="loading-data-from-a-sqlite-database">Loading data from a SQLite database</h2>
+
+<p>A set of <code>SQLite</code> database files can be provided to the software to load data from. </p>
+
+<p>The benefit of loading data from a <code>SQLite</code> database is that the software automatically loads the data based on the user’s selection of UV-NIR handoff range, measurement type, and value to extract. </p>
+
+<p>A disadvantage of loading from a database is less flexible as it assumes that the user wishes to load spectra data from the databases and has a strict format to follow.</p>
+
+<p><strong>Assumptions / Preconditions:</strong></p>
+
+<ul>
+<li>Each database file will contain one spectrum and a set of metadata about the spectrum to load. </li>
+<li>The spectrum from each file will all have the same range of wavelengths available to load.</li>
+<li>Each database file satisfies the format specified below.</li>
+<li>The memory size of each database file is smaller than 300MB.</li>
+</ul>
+
+<hr>
+
+
+
+<h2 id="loading-data-from-csv-files">Loading data from CSV files</h2>
+
+<p>Two <code>.csv</code> files for the data and metadata can be provided to the software to load data directly from.</p>
+
+<p>The benefit of loading data from <code>.csv</code> files is that it gives more flexibility to the user to determine the subject of the data to be loaded into the software. Therefore, the user is not restricted to just analyse spectra data and can analyse other types of data such as flashes per wavelength.</p>
+
+<p>A disadvantage of using this method of loading data is that the user must extract the data to analyse from the database manually into the <code>.csv</code> files.</p>
+
+<p><strong>Assumptions / Preconditions</strong></p>
+
+<ul>
+<li>When providing data to load via csv files, there should only be 2 files, the data file and the metadata file. </li>
+<li>Both files must follow the naming convention <code>(time.series)_data</code> and <code>(time.series)_metadata</code>  <br>
+<ul><li>where <code>(time.series)</code> is just the name of the time series represented in the data.</li></ul></li>
+<li>Both the files must have the same number of rows with the first column being identical.</li>
+<li>The data file must have column names that are numerical and in ascending order.</li>
+<li>If the metadata file is not provided, it is assumed there is no metadata available.</li>
+</ul>
+
+<hr>
+
+
+
+<h2 id="data-format">Data Format</h2>
+
+
+
+<h3 id="sqlite-database-format">SQLite Database Format</h3>
+
+<p>The <code>SQLite</code> databases containing the data must must have the 2 tables and meet the requirements below for the software to successfully extract the spectrum and metadata from each file.</p>
+
+
+
+<h4 id="table-calculateddatatable">TABLE: CalculatedDataTable</h4>
+
+<table>
+<thead>
+<tr>
+  <th align="center">Wavelength</th>
+  <th align="center">NumberFlashes</th>
+  <th align="center">(NIR/UV)_(Reference/Sample)_(StepSize/Slope)</th>
+</tr>
+</thead>
+<tbody><tr>
+  <td align="center">190</td>
+  <td align="center">2</td>
+  <td align="center">…</td>
+</tr>
+<tr>
+  <td align="center">190</td>
+  <td align="center">2</td>
+  <td align="center">…</td>
+</tr>
+<tr>
+  <td align="center">191</td>
+  <td align="center">2</td>
+  <td align="center">…</td>
+</tr>
+<tr>
+  <td align="center">…</td>
+  <td align="center">2</td>
+  <td align="center">…</td>
+</tr>
+</tbody></table>
+
+
+<ul>
+<li>The values in the NumberFlashes column must all be the same within a single database</li>
+<li>Logically, each unique value for the wavelength column will appear the same amount of times as the value in NumberFlashes</li>
+<li>There are 8 columns that will contain the actual data from the machine <br>
+<ul><li>Each column is one of the 8 combinations between <strong>NIR/UV</strong>, <strong>Reference/Sample</strong>, and <strong>StepSize/Slope</strong></li>
+<li>Example: <code>NIR_Reference_StepSize</code>, <code>NIR_Sample_StepSize</code>, <code>UV_Reference_Slope</code></li></ul></li>
+</ul>
+
+
+
+<h4 id="table-metadatatable">TABLE: MetaDataTable</h4>
+
+<table>
+<thead>
+<tr>
+  <th align="left">Key</th>
+  <th align="center">Value</th>
+</tr>
+</thead>
+<tbody><tr>
+  <td align="left">Scan Start Time</td>
+  <td align="center">…</td>
+</tr>
+<tr>
+  <td align="left">Scan Finish Time</td>
+  <td align="center">…</td>
+</tr>
+<tr>
+  <td align="left">Instrument Host Name</td>
+  <td align="center">…</td>
+</tr>
+<tr>
+  <td align="left">…</td>
+  <td align="center">…</td>
+</tr>
+</tbody></table>
+
+
+<ul>
+<li>The <strong>Key</strong> column will contain the names of the Metadata.</li>
+<li>The <strong>Value</strong> column will contain the values of the Metadata of the <strong>Key</strong> column. </li>
+<li>The values of both columns will be interpreted by the software as type <code>String</code>.</li>
+</ul>
+
+<hr>
+
+
+
+<h3 id="csv-files-format">CSV Files Format</h3>
+
+<p>The following are the formats of the data and metadata csv files respectively.</p>
+
+
+
+<h4 id="file-timeseriesdata">FILE: (time.series)_data</h4>
+
+<table>
+<thead>
+<tr>
+  <th align="left">test.id</th>
+  <th align="center">1</th>
+  <th align="center">2</th>
+  <th align="center">3</th>
+  <th align="center">4</th>
+  <th align="center">…</th>
+</tr>
+</thead>
+<tbody><tr>
+  <td align="left">x01</td>
+  <td align="center">…</td>
+  <td align="center">…</td>
+  <td align="center">…</td>
+  <td align="center">…</td>
+  <td align="center">…</td>
+</tr>
+<tr>
+  <td align="left">x02</td>
+  <td align="center">…</td>
+  <td align="center">…</td>
+  <td align="center">…</td>
+  <td align="center">…</td>
+  <td align="center">…</td>
+</tr>
+<tr>
+  <td align="left">x03</td>
+  <td align="center">…</td>
+  <td align="center">…</td>
+  <td align="center">…</td>
+  <td align="center">…</td>
+  <td align="center">…</td>
+</tr>
+<tr>
+  <td align="left">…</td>
+  <td align="center">…</td>
+  <td align="center">…</td>
+  <td align="center">…</td>
+  <td align="center">…</td>
+  <td align="center">…</td>
+</tr>
+</tbody></table>
+
+
+<ul>
+<li>Values for first column must each be a unique string of characters.</li>
+<li>Values for the other columns must be a numeric number.</li>
+<li>All column names (excluding the first column) must be a unique numeric value ordered in ascending order.</li>
+</ul>
+
+
+
+<h4 id="file-timeseriesmetadata">FILE: (time.series)_metadata</h4>
+
+<table>
+<thead>
+<tr>
+  <th align="left">test.id</th>
+  <th align="center">Scan Start Time</th>
+  <th align="center">Scan Stop Time</th>
+  <th align="center">Instrument Host Name</th>
+  <th align="center">…</th>
+</tr>
+</thead>
+<tbody><tr>
+  <td align="left">x01</td>
+  <td align="center">…</td>
+  <td align="center">…</td>
+  <td align="center">…</td>
+  <td align="center">…</td>
+</tr>
+<tr>
+  <td align="left">x02</td>
+  <td align="center">…</td>
+  <td align="center">…</td>
+  <td align="center">…</td>
+  <td align="center">…</td>
+</tr>
+<tr>
+  <td align="left">x03</td>
+  <td align="center">…</td>
+  <td align="center">…</td>
+  <td align="center">…</td>
+  <td align="center">…</td>
+</tr>
+<tr>
+  <td align="left">…</td>
+  <td align="center">…</td>
+  <td align="center">…</td>
+  <td align="center">…</td>
+  <td align="center">…</td>
+</tr>
+</tbody></table>
+
+
+<ul>
+<li>Values for first column must each be a unique string of characters.</li>
+<li>Values for the other columns can be any type and will be interpreted as a string of characters.</li>
+<li>All column names (excluding the first column) must be a unique string of characters.</li>
+</ul>
+
+<hr>
+
+
+
+<h2 id="page-interface">Page Interface</h2>
+
+<p><strong>Data Input Type</strong>: <br>
+The method to use to load data into the software. Choose between loading from <code>SQLite</code> database files or loading data and metadata <code>.csv</code> files.</p>
+
+<blockquote>
+  <p><strong>Note</strong>:</p>
+  
+  <ul>
+  <li>If <em>“Database Files”</em> are chosen, user must adjust data loading configurations in addition to uploading the data files before loading the data.</li>
+  <li>If <em>“CSV Data Files”</em> are chosen, user just needs to provide the main data <code>.csv</code> file and an optional metadata <code>.csv</code> file before loading the data.</li>
+  </ul>
+</blockquote>
+
+<p><strong>CSV Data File</strong>: <br>
+Allows user to select a <strong>single</strong> <code>.csv</code> data file to upload to software. </p>
+
+<p>Only appears when <em>“CSV Data Files”</em> is chosen for <strong>Data Input Type</strong>.</p>
+
+<p><strong>CSV Metadata File</strong>: <br>
+Allows user to select a <strong>single</strong> <code>.csv</code> metadata file to upload to software. </p>
+
+<p>Only appears when <em>“CSV Data Files”</em> is chosen for <strong>Data Input Type</strong>.</p>
+
+<p><strong>Database Files</strong>: <br>
+Allows user to select multiple <code>SQLite</code> database files to upload to software. </p>
+
+<p>Only appears when <em>“Database Files”</em> is chosen for <strong>Data Input Type</strong>.</p>
+
+<p><strong>Handoff Range (Handoff Min &amp; Handoff Max)</strong>: <br>
+Specify the wavelength range within which (inclusive) to use measurement from the <em>UV</em> sensors. Wavelengths outside this range will use values from <em>NIR</em> sensors.</p>
+
+<p>Only appears when <em>“Database Files”</em> is chosen for <strong>Data Input Type</strong>.</p>
+
+<p><strong>Measurement</strong>: <br>
+Specify the type of measurement, <em>StepSize</em> or <em>Slope</em>, to load from the database.</p>
+
+<p>Only appears when <em>“Database Files”</em> is chosen for <strong>Data Input Type</strong>.</p>
+
+<p><strong>Type of Value</strong>: <br>
+Specify the type of value to calculate or extract from the database. Options are <em>Transmission</em>, <em>Absorption</em>, <em>Reference</em>, and <em>Sample</em>.</p>
+
+<p>Only appears when <em>“Database Files”</em> is chosen for <strong>Data Input Type</strong>.</p>
+
+<p><strong>Load Data</strong>: <br>
+Loads the data from the input type specified following the configurations given by the user (if needed).</p>
+
+<hr>
+
+
+
+<h1 id="tests-overview">Tests Overview</h1>
+
+<p>This page aims to visualise difference between the tests selected using a method known as Classic Multidimensional Scaling (MDS). Classic MDS takes data in a high-dimensional space and visualises their (euclidean) distance in a lower number of dimensions (2 in this case) <a href="#fn:mds" id="fnref:mds" title="See footnote" class="footnote">1</a>. This will hopefully allow for more focused analysis to be done on the tests.</p>
+
+<p>The purpose of this page would be to see how different tests or rows in the data are and identify interesting groups of tests or rows of data to further analyse and compare against each other.</p>
+
+
+
+<h2 id="page-interface-1">Page Interface</h2>
+
+<p><strong>Time Series Range</strong> <br>
+Range of the time series to include in the calculation for the values in the MDS plot.</p>
+
+<p><strong>Select Rows</strong> <br>
+The rows from the <code>.csv</code> data file or tests from the <code>SQLite</code> database files to include in the MDS plot.</p>
+
+<blockquote>
+  <p>The Reason for requiring at least 3 rows of data is because just plotting 2 rows would not provide any valuable information.</p>
+</blockquote>
+
+<p><strong>MDS Type</strong> <br>
+The type of method to use to categorise and colour the data on the MDS plot.</p>
+
+<ul>
+<li>Categorical: Assigns a distinct colour to each row based on the metadata value of each row.</li>
+<li>Colour Scale: Assigns each row a colour from a colour scale based on the metadata value of each row by alphanumeric order.</li>
+<li>Clustering: Automatically assigns a colour to each point based on which cluster a clustering algorithm assigns the point to. Number of clusters can be controlled</li>
+</ul>
+
+<p><strong>Metadata Available</strong> <br>
+The metadata to use for assigning categories or colours to the rows in the data. Selection of metadata available will be based on the metadata <code>.csv</code> file or the <code>MetaDataTable</code> from the <code>SQLite</code> database.</p>
+
+<p>Only appears when either <em>Categorical</em> or <em>Colour Scale</em> is selected for <strong>MDS Type</strong></p>
+
+<p><strong>Number of Clusters</strong> <br>
+The number of clusters the clustering algorithm needs to separate the data points in the MDS plot to. Has a minimum of 1 and a maximum of the number of rows/tests selected - 1.</p>
+
+<p>Only appears when wither <em>Clustering</em> is selected for <strong>MDS Type</strong></p>
+
+<hr>
+
+
+
+<h1 id="compare-spectra">Compare Spectra</h1>
+
+<p>Gives functionality to compare and analyse a query group of data against a base group of data. Contains 2 graphs, <strong>“Base and Query Time-Series Data”“</strong> and <strong>“Analysis of Query Time Series data”</strong>, on top of one another.</p>
+
+<p>The main purpose of this page is to allow the user to figure out how do 2 different (or even overlapping) groups of data differ from each other specifically.</p>
+
+
+
+<h2 id="base-and-query-time-series-data">Base and Query Time-Series data</h2>
+
+<p>This simple graph plots the average value of the base and query group data over the time series. This allows the user to see how the 2 data groups differ at each point of the time series.</p>
+
+
+
+<h2 id="analysis-of-query-time-series-data">Analysis of Query Time Series data</h2>
+
+<p>This graph allows the user to select the type of values to assign to the y-value and weights at each data point in the time series. The type of values the user can choose from are: <em>p-value</em>, <em>standard deviation</em>, and <em>outlier score</em>.</p>
+
+
+
+<h3 id="p-value">p-value</h3>
+
+<p>The p-value is calculated from constructing a separate normal distribution for each point of the time series from the base data. A 2-tailed hypothesis test is then carried out on the means of the query data using the normal distributions constructed at each point of the time series and the p-value for each time series point is obtained.</p>
+
+<blockquote>
+  <p>The p-value represents the probability that the base data would contain the mean of the query data or more extreme at that specific point in the time series.</p>
+</blockquote>
+
+
+
+<h3 id="standard-deviation">Standard Deviation</h3>
+
+<p>The value of the standard deviation used for this graph is obtained by calculating the <strong>unbiased</strong> standard deviation of the values in the base data at each point of the time series. <br>
+<script type="math/tex; mode=display" id="MathJax-Element-4">
+\textit{Unbiased Standard Deviation} = \sqrt{\frac{1}{n - 1}\sum_{i=1}^{n}(x_i - \bar{x})^2}
+</script></p>
+
+
+
+<h3 id="outlier-score">Outlier Score</h3>
+
+<p>The values for the outlier score is calculated by passing all the values in the base data with the mean of the query data at each point in the time series into an outlier algorithm. The outlier factor, as calculated from the algorithm, for the mean of the query data is then used as the value for the outlier score.</p>
+
+<p>More specifically, this method used the <strong>Local Outlier Factor</strong> algorithm which identifies density-based local outliers of a group of data<a href="#fn:breunig-et-al-2000" id="fnref:breunig-et-al-2000" title="See footnote" class="footnote">2</a>.</p>
+
+
+
+<h2 id="page-interface-2">Page Interface</h2>
+
+<p><strong>Time Series Range</strong> <br>
+Range of the time series to include in the calculation for the values in the graphs.</p>
+
+<p><strong>y Value</strong> <br>
+The type of value to use for the y-axis in the <strong>“Analysis of query Time Series data”</strong> graph.</p>
+
+<p><strong>Weight Value</strong> <br>
+The type of value to use for the weights in the <strong>“Analysis of query Time Series data”</strong> graph.</p>
+
+<p><strong>Select Base Rows</strong> <br>
+The rows/spectra to be included in the base data.</p>
+
+<blockquote>
+  <p>Needs at least 2 rows/spectra as the <em>unbiased standard deviation</em> needs at least 2 or more values to be calculated.</p>
+</blockquote>
+
+<p><strong>Select Query Rows</strong> <br>
+The rows/spectra to be included in the query data.</p>
+
+<hr>
+
+
+
+<h1 id="view-spectra">View Spectra </h1>
+
+<p>Simple plotter that just plots selected spectra individually on the same graph. Can be used to purely compare the values of 2 or more spectra against one another with no averaging.</p>
+
+<p>The main purpose of this page is a fail safe in case the analysis from the previous pages were unclear and manual analysis is needed.</p>
+
+
+
+<h2 id="page-interface-3">Page Interface</h2>
+
+<p><strong>Time Series Range</strong> <br>
+Range of the time series to include in the calculation for the values in the graph.</p>
+
+<p><strong>Select Rows</strong> <br>
+The rows/spectra to be plotted in the graph.</p>
+
+<div class="footnotes"><hr><ol><li id="fn:mds">Borg, I., &amp; Groenen, P. J. (2005). Modern multidimensional scaling: Theory and applications. Springer Science &amp; Business Media. <a href="#fnref:mds" title="Return to article" class="reversefootnote">↩</a></li><li id="fn:breunig-et-al-2000">Breunig, M. M., Kriegel, H. P., Ng, R. T., &amp; Sander, J. (2000, May). LOF: identifying density-based local outliers. In ACM sigmod record (Vol. 29, No. 2, pp. 93-104). ACM. <a href="#fnref:breunig-et-al-2000" title="Return to article" class="reversefootnote">↩</a></li></ol></div></div></body>
+</html>

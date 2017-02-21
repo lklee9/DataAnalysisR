@@ -29,10 +29,14 @@ PlotAllWindowSizes <- function(drift.type, subset.length, directory, column.indc
 PlotWindowSize <- function(drift.type, window.length, subset.length, directory, column.indcies) {
   window.length <- as.integer(window.length)
   file.name <- list.files(path = directory, pattern = paste0(drift.type, "_", window.length, "_", subset.length))[1]
+  print(window.length)
+  print(subset.length)
+  print(list.files(path = directory))
+  print(paste0(drift.type, "_", window.length, "_", subset.length, ".*"))
   
   print(file.name)
   drift.timeline <- read.csv(paste0(directory, "/", file.name))
-  if (length(column.indcies) == 0) column.indcies <- (3:(ncol(drift.timeline)))
+  if (length(column.indcies) == 0) column.indcies <- (2:(ncol(drift.timeline)))
   
   timeline.plot <- PlotDriftTimeline(drift.timeline, window.length, 900, 200) %>%
     layout(showlegend = TRUE, title = paste(drift.type, window.length)) %>%
@@ -45,7 +49,9 @@ PlotWindowSize <- function(drift.type, window.length, subset.length, directory, 
 
 PlotDriftTimeline <- function(drift.timeline, window.size, width, height) {
   col.names <- names(drift.timeline)
-  p <- plot_ly(drift.timeline, x = ~points, y = drift.timeline[, 2], width = width, height = height,
+  # p <- plot_ly(drift.timeline, x = ~points, y = drift.timeline[, 2], width = width, height = height,
+  #              name = paste(window.size, names(drift.timeline)[2]), type = "scatter", mode = "lines")
+  p <- plot_ly(drift.timeline, x = ~points, y = drift.timeline[, 2],
                name = paste(window.size, names(drift.timeline)[2]), type = "scatter", mode = "lines")
   if (ncol(drift.timeline) > 2) {
     for (i in 3:ncol(drift.timeline)) {

@@ -13,6 +13,12 @@ ReadArffData <- function(file1, file2 = NA) {
   }
 }
 
+ReadArffFiles <- function(files) {
+    data.list <- lapply(files, function(x) read.arff(x))
+    data.all <- Reduce(function(x,y) rbind(x, y), data.list)
+    return(data.all)
+}
+
 SplitData <- function(file_path) {
   data.original <- read.arff(file_path)
   data.1 <- data.original[1:floor(nrow(data.original)/2), ]
