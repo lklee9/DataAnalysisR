@@ -33,15 +33,19 @@ Furthermore, there seems to be an event at point `17532` that caused large drift
 Therefore, it will make most sense to analyse the drift between data before and after this point.
 
 ```{r detail, echo = FALSE}
-results.pos.1 <- ResultTable(paste0("../../../../../data_out/elecNormNew/analyse/1-attributes_posterior_detailed.csv"))
-results.pos.2 <- ResultTable(paste0("../../../../../data_out/elecNormNew/analyse/2-attributes_posterior_detailed.csv"))
-results.like.1 <- ResultTable(paste0("../../../../../data_out/elecNormNew/analyse/1-attributes_likelihood_detailed.csv"))
-results.like.2 <- ResultTable(paste0("../../../../../data_out/elecNormNew/analyse/2-attributes_likelihood_detailed.csv"))
+results.cov.1 <- ResultTable("../../../../../data_out/elecNormNew/analyse/1-attributes_covariate.csv")
+results.joint.1 <- ResultTable("../../../../../data_out/elecNormNew/analyse/1-attributes_joint.csv")
+results.pos.d.1 <- ResultTable(paste0("../../../../../data_out/elecNormNew/analyse/1-attributes_posterior_detailed.csv"))
+results.pos.1 <- ResultTable(paste0("../../../../../data_out/elecNormNew/analyse/1-attributes_posterior.csv"))
+results.pos.2 <- ResultTable(paste0("../../../../../data_out/elecNormNew/analyse/2-attributes_posterior.csv"))
+results.like.d.1 <- ResultTable(paste0("../../../../../data_out/elecNormNew/analyse/1-attributes_likelihood_detailed.csv"))
+results.like.1 <- ResultTable(paste0("../../../../../data_out/elecNormNew/analyse/1-attributes_likelihood.csv"))
+results.like.2 <- ResultTable(paste0("../../../../../data_out/elecNormNew/analyse/2-attributes_likelihood.csv"))
 ```
 
 ### Detailed Likelihood (Single Attributes)
 ```{r, echo = FALSE}
-  VisualSingleLikelihoodAttribute(results.like.1)
+  VisualSingleLikelihoodAttribute(results.like.d.1)
 ```
 
 As expected `vicprice`, `vicdemand`, and `transfer` had the greatest `Likelihood` drift possibly due to their high `Covariate` drift.
@@ -53,7 +57,7 @@ This difference probability means that the `Covariate` drift of `nswprice` affec
 
 ### Detailed Posterior (Single Attributes)
 ```{r, echo = FALSE}
-  VisualSingleAttributeStructure(results.pos.1, "posterior")
+  VisualSingleAttributeStructure(results.pos.d.1, "posterior")
 ```
 
 From the Detailed Posterior figure, we can observe that most of the posterior drift is from the attributes `transfer` and `vicdemand`.
@@ -62,6 +66,13 @@ For the continous attribute `transfer`, the values that drift the most are the e
 indicating that the class distribution given these values has changed significantly.
 
 Similarly for the continous attribute `vicdemand`, most of the posterior drift occurs on the larger values of the attribute also indicating the change in class distribution give these attribute values.
+
+```{r}
+    VisualSingleAttribute(results.cov.1)
+    VisualSingleAttribute(results.joint.1)
+    VisualPairAttributes(results.pos.1, results.pos.2)
+    VisualPairAttributes(results.like.1, results.like.2)
+```
 
 
 ### Reason for the spike around instance 17,328

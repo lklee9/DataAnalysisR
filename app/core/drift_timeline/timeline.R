@@ -27,18 +27,15 @@ PlotAllWindowSizes <- function(drift.type, subset.length, directory, column.indc
 }
 
 PlotWindowSize <- function(drift.type, window.length, subset.length, directory, column.indcies) {
-  window.length <- as.integer(window.length)
-  file.name <- list.files(path = directory, pattern = paste0(drift.type, "_", window.length, "_", subset.length))[1]
-  print(window.length)
-  print(subset.length)
-  print(list.files(path = directory))
-  print(paste0(drift.type, "_", window.length, "_", subset.length, ".*"))
+  data.list <- GetTimelineData(drift.type, subset.length, directory, window.length)
+  if (length(column.indcies) == 0) column.indcies <- (2:(ncol(data.list[[1]])))
+  if (subset.length < GetMaxSubsetLength(directory)) {
+      max.data.list <- GetTimelineData(drift.type, GetMaxSubsetLength(directory), directory, window.length)
+      data.list <- lapply(seq(1:length(data.list)), function(x) data.frame(
+          max.data.list[[x]][,c(1,2)], data.list[[x]][, unique(c(column.indcies))]))
+  }
   
-  print(file.name)
-  drift.timeline <- read.csv(paste0(directory, "/", file.name))
-  if (length(column.indcies) == 0) column.indcies <- (2:(ncol(drift.timeline)))
-  
-  timeline.plot <- PlotDriftTimeline(drift.timeline, window.length, 900, 200) %>%
+  timeline.plot <- PlotDriftTimeline(data.list[[1]], window.length, 900, 200) %>%
     layout(showlegend = TRUE, title = paste(drift.type, window.length)) %>%
     layout(
       annotations = list(
@@ -62,8 +59,8 @@ PlotDriftTimeline <- function(drift.timeline, window.size, width, height) {
   return(p)
 }
 
-GetTimelineData <- function(drift.type, subset.length, directory) {
-    files.all <- list.files(path = directory, pattern = paste0(drift.type, "_.*_", subset.length))
+GetTimelineData <- function(drift.type, subset.length, directory, window.size = ".*") {
+    files.all <- list.files(path = directory, pattern = paste0(drift.type, "_", window.size, "_", subset.length))
     window.sizes <- sapply(files.all, function(x) as.integer(strsplit(x, "[_.]")[[1]][2]))
     files.all <- files.all[order(window.sizes, files.all)]
     window.sizes <- sort(window.sizes)

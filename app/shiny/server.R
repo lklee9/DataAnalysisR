@@ -3,6 +3,10 @@ library(shinyjs)
 source("../core/verification/read_data.R")
 source("../core/verification/compare_distributions.R")
 source("../core/drift_timeline/timeline.R")
+source("../core/visualise_results/result_table.R")
+source("../core/visualise_results/heatmaps.R")
+source("../core/visualise_results/detailed_likelihood.R")
+source("../core/visualise_results/detailed_posterior.R")
 
 # Increase file size limit
 options(shiny.maxRequestSize=100*1024^2)
@@ -39,6 +43,7 @@ shinyServer(function(input, output) {
       shinyjs::toggle("timeline.panel", condition = !is.null(data.table$data))
       shinyjs::toggle("analyse.plot", condition = !is.null(data.table$data))
       shinyjs::toggle("chunk.attribute.num.vals", condition = grepl("_chunk", input$timeline.type))
+      shinyjs::toggle("analyse.drift.type", condition = input$analyse.type == "analysis")
       # shinyjs::toggle("size.confirm", condition = grepl("_chunk", input$timeline.type))
       # shinyjs::toggle("size.reset", condition = grepl("_chunk", input$timeline.type))
       # shinyjs::toggle("size.recorded", condition = grepl("_chunk", input$timeline.type))
@@ -134,10 +139,15 @@ shinyServer(function(input, output) {
   })
   
   observeEvent(input$run.timeline, {
-      sizes.current <- if (input$timeline.type == "stream") paste0(sizes$window.sizes, collapse = ',') else paste(match(input$select.chunk.attribute, names(data.table$data)), paste0(sizes$chunk.sizes, collapse = ','), sep = ",")
+      sizes.current <- if (input$timeline.type == "stream") paste0(sizes$window.sizes, collapse = ',') else paste((match(input$select.chunk.attribute, names(data.table$data)) - 1), paste0(sizes$chunk.sizes, collapse = ','), sep = ",")
+      subset.lengths <- if (input$timeline.type == "stream") unique(c(input$slider.attribute.subset.length, (ncol(data.table$data) - 1))) else unique(c(input$slider.attribute.subset.length, (ncol(data.table$data) - 2)))
       withProgress(message = "Running Analysis...", {
+          cmd <- paste("java", "-jar", "../MarTVarD.jar", input$timeline.type, 
+                                   paste(subset.lengths, collapse = ","), sizes.current, 
+                                   paste(data.out.foler, data.table$name, sep = "/"), data.table$paths)
+          print(cmd)
           ret <- system2("java", c("-jar", "../MarTVarD.jar", input$timeline.type, 
-                                   input$slider.attribute.subset.length, sizes.current, 
+                                   paste(subset.lengths, collapse = ","), sizes.current, 
                                    paste(data.out.foler, data.table$name, sep = "/"), data.table$paths))
       })
   })
@@ -152,7 +162,9 @@ shinyServer(function(input, output) {
       if (input$select.timeline.plot.data == "") {
           return()
       }
-      selectInput("select.timeline.plot.type", "Timeline Type", list.files(path = paste(data.out.foler, input$select.timeline.plot.data, sep = "/")))
+      types <- list.files(path = paste(data.out.foler, input$select.timeline.plot.data, sep = "/"))
+      types <- types[! types %in% "analyse"]
+      selectInput("select.timeline.plot.type", "Timeline Type", types)
   })
   
   output$timeline.plot.drift.type <- renderUI({
@@ -231,8 +243,47 @@ shinyServer(function(input, output) {
       if (is.null(data.table)) {
           return()
       }
-      output$analysis.plot <- renderPlot(Histogram(data.table$data[seq(input$numeric.start.index, (input$numeric.middle.index - 1)), ], 
-                                                   data.table$data[seq(input$numeric.middle.index, input$numeric.end.index), ]))
+      else if (input$analyse.type == "compare") {
+          shinyjs::show("analysis.plot")
+          output$analysis.plot <- renderPlot(Histogram(data.table$data[seq(input$numeric.start.index, (input$numeric.middle.index - 1)), ], 
+                                                       data.table$data[seq(input$numeric.middle.index, input$numeric.end.index), ]))
+      }
+      else {
+          shinyjs::hide("analysis.plot")
+          analyse.folder <- paste(data.out.foler, data.table$name, "analyse", sep = "/")
+          if (length(list.files(analyse.folder)) == 0) {
+              withProgress(message = "Running Analysis...", {
+                  ret <- system2("java", c("-jar", "../MarTVarD.jar", "analyse",
+                                           "1,2", paste(input$numeric.start.index + 1, input$numeric.middle.index, input$numeric.end.index, sep = ","), 
+                                           paste(data.out.foler, data.table$name, sep = "/"), data.table$paths))         
+                  })
+          }
+          drift.type <- input$analyse.drift.type
+          if (drift.type == "COVARIATE") {
+              results.cov.1 <- ResultTable(paste(data.out.foler, data.table$name, "analyse/1-attributes_covariate.csv", sep = "/"))
+              results.cov.2 <- ResultTable(paste(data.out.foler, data.table$name, "analyse/2-attributes_covariate.csv", sep = "/"))
+              output$analysis.2att.plot <- renderPlotly(VisualPairAttributes(results.cov.1, results.cov.2, drift.type = "Covariate"))
+          }
+          else if (drift.type == "JOINT") {
+              results.joint.1 <- ResultTable(paste(data.out.foler, data.table$name, "analyse/1-attributes_joint.csv", sep = "/"))
+              results.joint.2 <- ResultTable(paste(data.out.foler, data.table$name, "analyse/2-attributes_joint.csv", sep = "/"))
+              output$analysis.2att.plot <- renderPlotly(VisualPairAttributes(results.joint.1, results.joint.2, drift.type = "Joint"))
+          }
+          else if (drift.type == "POSTERIOR") {
+              results.pos.d.1 <- ResultTable(paste(data.out.foler, data.table$name, "analyse/1-attributes_posterior_detailed.csv", sep = "/"))
+              results.pos.1 <- ResultTable(paste(data.out.foler, data.table$name, "analyse/1-attributes_posterior.csv", sep = "/"))
+              results.pos.2 <- ResultTable(paste(data.out.foler, data.table$name, "analyse/2-attributes_posterior.csv", sep = "/"))
+              output$analysis.2att.plot <- renderPlotly(VisualPairAttributes(results.pos.1, results.pos.2, drift.type = "Posterior"))
+              output$analysis.detailed.plot <- renderPlotly(VisualSingleAttributeStructure(results.pos.d.1, "Posterior"))
+          }
+          else if (drift.type == "LIKELIHOOD") {
+              results.like.d.1 <- ResultTable(paste(data.out.foler, data.table$name, "analyse/1-attributes_likelihood_detailed.csv", sep = "/"))
+              results.like.1 <- ResultTable(paste(data.out.foler, data.table$name, "analyse/1-attributes_likelihood.csv", sep = "/"))
+              results.like.2 <- ResultTable(paste(data.out.foler, data.table$name, "analyse/2-attributes_likelihood.csv", sep = "/"))
+              output$analysis.2att.plot <- renderPlotly(VisualPairAttributes(results.like.1, results.like.2, drift.type = "Likelihood"))
+              output$analysis.detailed.plot <- renderPlotly(VisualSingleLikelihoodAttribute(results.like.d.1))
+          }
+      }
   })
 })
 

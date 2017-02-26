@@ -61,22 +61,28 @@ timelinePlotPage <- fluidPage(verticalLayout(
     wellPanel(id = "analyse.plot",
               selectInput("analyse.type", 
                           "Select Analyse Type", 
-                          c("Drift Analysis", "Compare Distributions")),
+                          c("Drift Analysis" = "analysis", "Compare Distributions" = "compare")),
               fluidRow(
                   column(4, uiOutput("start.index")),
                   column(4, uiOutput("middle.index")),
                   column(4, uiOutput("end.index"))
               ),
+              selectInput("analyse.drift.type", 
+                          "Select Drift Type",
+                          c("COVARIATE", "JOINT", "LIKELIHOOD", "POSTERIOR")),
               actionButton("analyse.plot.run", "Run Analysis")),
     plotOutput("analysis.plot"),
+    column(8,
+    plotlyOutput("analysis.2att.plot"),
+    plotlyOutput("analysis.detailed.plot")
+    ),
     textOutput("debug")
 ))
 
 shinyUI(fluidPage(
   navbarPage("Spectra Analysis",
              tabPanel("Data Selection", loadDataFile),
-             tabPanel("Analyse", analysePage),
-             tabPanel("Timeline", timelinePlotPage)
+             tabPanel("Analyse", timelinePlotPage)
 )
 ))
 
