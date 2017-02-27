@@ -31,7 +31,11 @@ VisualSingleLikelihoodAttribute <- function(data.all) {
                   colors = colorRamp(c("green", "red")),
                   width = 620,
                   height = 510,
-                  type = "heatmap")
+                  type = "heatmap") %>% 
+    layout(margin = list(l = 100, r = 30, b = 100, t = 50, pad = 4),
+           width = 620,
+           height = 510,
+           autosize = F)
   
   return(plot)
 }

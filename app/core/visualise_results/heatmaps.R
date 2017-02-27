@@ -91,13 +91,14 @@ matrixToHeatmap <- function(values.matrix, z_min, z_max, labels = c("", "", ""),
                   zmin = z_min,
                   zmax = z_max,
                   colorscale = colz, 
-                  width = size[1],
-                  height = size[2],
                   type = "heatmap") %>% 
-    layout(title = labels[1], 
+    layout(margin = list(l = 100, r = 30, b = 100, t = 50, pad = 10),
+           width = size[1],
+           height = size[2],
+           title = labels[1], 
            xaxis = list(title = labels[2]), 
-           yaxis = list(title = labels[3]),
-           margin = list(h = 300))
+           yaxis = list(title = labels[3]))
+           
   
   return(plot)
 }

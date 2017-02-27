@@ -72,9 +72,14 @@ timelinePlotPage <- fluidPage(verticalLayout(
                           c("COVARIATE", "JOINT", "LIKELIHOOD", "POSTERIOR")),
               actionButton("analyse.plot.run", "Run Analysis")),
     plotOutput("analysis.plot"),
-    column(8,
-    plotlyOutput("analysis.2att.plot"),
-    plotlyOutput("analysis.detailed.plot")
+    fluidRow(
+    column(8, 
+           plotlyOutput("analysis.2att.plot"),
+           div(style = "height:150px"))
+    ),
+    fluidRow(
+      column(8,
+             plotlyOutput("analysis.detailed.plot"))
     ),
     textOutput("debug")
 ))

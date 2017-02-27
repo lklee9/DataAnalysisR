@@ -33,9 +33,10 @@ GetSinglePosteriorConditionPlot <- function(data.all, condition.attribute) {
   plot <- plot_ly(x = condition.values, 
                   y = posterior.drift,
                   name = condition.attribute,
-                  type = "bar") %>% layout(title = "",
-                                           xaxis = list(title = condition.attribute), 
-                                           yaxis = list(title = "Posterior Drift"))
+                  type = "bar") %>% 
+    layout(margin = list(l = 100, r = 30, b = 100, t = 50, pad = 4),
+           title = "Posterior Drift",
+           xaxis = list(title = condition.attribute))
   return(plot)
 }
 
