@@ -3,3 +3,4 @@
 .RData
 .Ruserdata
 *.jar
+app/shiny/data_out/
