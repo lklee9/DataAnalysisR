@@ -62,7 +62,7 @@ shinyServer(function(input, output) {
   })
   
   # ------ Timeline Generator
-
+  
   output$attribute.subset.length <- renderUI({
       min <- 1
       # one less for class
@@ -87,7 +87,7 @@ shinyServer(function(input, output) {
           return()
       }
       selectInput("select.chunk.attribute",
-                  "Chunk Attribute:",
+                  "Time Attribute:",
                   names(data.table$data)[1:ncol(data.table$data) - 1])
   })
   
@@ -95,7 +95,7 @@ shinyServer(function(input, output) {
       if (is.null(data.table$data) || !grepl("_chunk", input$timeline.type)) {
           return()
       }
-      numericInput("num.chunk.input", label = "Chunk Size to Add", min = 1, value = 1)
+      numericInput("num.chunk.input", label = " Window Duration", min = 1, value = 1)
   })
   
   output$window.input <- renderUI({
@@ -149,7 +149,7 @@ shinyServer(function(input, output) {
       }
       else {
           sizes$chunk.sizes <- unique(c(sizes$chunk.sizes, input$num.chunk.input))
-          output$size.recorded <- renderText(paste("Chunk Sizes:", paste(sizes$chunk.sizes, collapse = ",")))
+          output$size.recorded <- renderText(paste("Window Durations:", paste(sizes$chunk.sizes, collapse = ",")))
       }
   })
   
@@ -160,7 +160,7 @@ shinyServer(function(input, output) {
       }
       else {
           sizes$chunk.sizes <- c()
-          output$size.recorded <- renderText(paste("Chunk Sizes:", paste(sizes$chunk.sizes, collapse = ",")))
+          output$size.recorded <- renderText(paste("Window Durations:", paste(sizes$chunk.sizes, collapse = ",")))
       }
   })
   
@@ -210,7 +210,7 @@ shinyServer(function(input, output) {
       if (input$select.timeline.plot.type == "") {
           return()
       }
-      selectInput("select.timeline.plot.sizes", "Window/Chunk Size",
+      selectInput("select.timeline.plot.sizes", "Window Size/Duration",
                   unique(sapply(
                       list.files(paste(data.out.foler,
                                        input$select.timeline.plot.data,
@@ -240,8 +240,7 @@ shinyServer(function(input, output) {
                                                              directory = paste(data.out.foler, 
                                                                                input$select.timeline.plot.data, 
                                                                                input$select.timeline.plot.type, 
-                                                                               sep = "/"),
-                                                             c()))
+                                                                               sep = "/")))
   })
   
   # --------- Compare / Analyse
