@@ -17,7 +17,11 @@ loadDataFile <- sidebarLayout(
                   "Moving Chunk" = "moving_chunk")
                 ),
     uiOutput("attribute.subset.length"),
-    textOutput("timeline.description"),
+    fluidRow(
+        column(6, actionButton("length.confirm", label = "Add Length")),
+        column(6, actionButton("length.reset", label = "Reset Lengths"))
+        ),
+    textOutput("subset.length.recorded"),
     hr(),
     uiOutput("chunk.attribute"),
     textOutput("chunk.attribute.num.vals"),

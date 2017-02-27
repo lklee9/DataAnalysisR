@@ -1,5 +1,6 @@
 library(shiny)
 library(shinyjs)
+source("../core/visualisation.R")
 source("../core/verification/read_data.R")
 source("../core/verification/compare_distributions.R")
 source("../core/drift_timeline/timeline.R")
@@ -104,15 +105,40 @@ shinyServer(function(input, output) {
       numericInput("num.window.input", label = "Window Size to Add", min = 1, max = ncol(data.table$data), value = 1)
       #sliderInput("num.window.input", label = "Window Size to Add", min = 1, max = nrow(data.table$data), value = 1, step = 1)
   })
-
+  
+  subset.lengths <- reactiveValues(window.lengths = c(), chunk.lengths = c())
   sizes <- reactiveValues(chunk.sizes = c(), window.sizes = c())
 
   observeEvent(input$timeline.type, {
       if (input$timeline.type == "stream") {
           output$size.recorded <- renderText(paste("Window Sizes:", paste(sizes$window.sizes, collapse = ",")))
+          output$subset.length.recorded <- renderText(paste("Subset Lengths:", paste(subset.lengths$window.lengths, collapse = ",")))
       }
       else {
-          output$size.recorded <- renderText(paste("Chunk Sizes:", paste(sizes$chunk.sizes, collapse = ",")))
+          output$size.recorded <- renderText(paste("Window Durations:", paste(sizes$chunk.sizes, collapse = ",")))
+          output$subset.length.recorded <- renderText(paste("Subset Lengths:", paste(subset.lengths$chunk.lengths, collapse = ",")))
+      }
+  })
+  
+  observeEvent(input$length.confirm, {
+      if (input$timeline.type == "stream") {
+          subset.lengths$window.lengths <- unique(c(subset.lengths$window.lengths, input$slider.attribute.subset.length))
+          output$subset.length.recorded <- renderText(paste("Subset Lengths:", paste(subset.lengths$window.lengths, collapse = ",")))
+      }
+      else {
+          subset.lengths$chunk.lengths <- unique(c(subset.lengths$chunk.lengths, input$slider.attribute.subset.length))
+          output$subset.length.recorded <- renderText(paste("Subset Lengths:", paste(subset.lengths$chunk.lengths, collapse = ",")))
+      }
+  })
+  
+  observeEvent(input$length.reset, {
+      if (input$timeline.type == "stream") {
+          subset.lengths$window.lengths <- c()
+          output$subset.length.recorded <- renderText(paste("Subset Lengths:", paste(subset.lengths$window.lengths, collapse = ",")))
+      }
+      else {
+          subset.lengths$chunk.lengths <- c()
+          output$subset.length.recorded <- renderText(paste("Subset Lengths:", paste(subset.lengths$chunk.lengths, collapse = ",")))
       }
   })
 
@@ -140,7 +166,7 @@ shinyServer(function(input, output) {
   
   observeEvent(input$run.timeline, {
       sizes.current <- if (input$timeline.type == "stream") paste0(sizes$window.sizes, collapse = ',') else paste((match(input$select.chunk.attribute, names(data.table$data)) - 1), paste0(sizes$chunk.sizes, collapse = ','), sep = ",")
-      subset.lengths <- if (input$timeline.type == "stream") unique(c(input$slider.attribute.subset.length, (ncol(data.table$data) - 1))) else unique(c(input$slider.attribute.subset.length, (ncol(data.table$data) - 2)))
+      subset.lengths <- if (input$timeline.type == "stream") paste0(subset.lengths$window.lengths, collapse = ",") else paste0(subset.lengths$chunk.lengths, collapse = ",")
       withProgress(message = "Running Analysis...", {
           cmd <- paste("java", "-jar", "../MarTVarD.jar", input$timeline.type, 
                                    paste(subset.lengths, collapse = ","), sizes.current, 
@@ -203,7 +229,8 @@ shinyServer(function(input, output) {
                                        input$select.timeline.plot.data,
                                        input$select.timeline.plot.type, sep = "/"
                                        )),
-                      function(x) strsplit(x, split = "[_.]")[[1]][3])))
+                      function(x) strsplit(x, split = "[_.]")[[1]][3])),
+                  multiple = TRUE)
   })
   
   observeEvent(input$timeline.plot.run, {

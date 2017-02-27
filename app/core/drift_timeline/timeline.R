@@ -26,16 +26,11 @@ PlotAllWindowSizes <- function(drift.type, subset.length, directory, column.indc
   return(g)
 }
 
-PlotWindowSize <- function(drift.type, window.length, subset.length, directory, column.indcies) {
-  data.list <- GetTimelineData(drift.type, subset.length, directory, window.length)
-  if (length(column.indcies) == 0) column.indcies <- (2:(ncol(data.list[[1]])))
-  if (subset.length < GetMaxSubsetLength(directory)) {
-      max.data.list <- GetTimelineData(drift.type, GetMaxSubsetLength(directory), directory, window.length)
-      data.list <- lapply(seq(1:length(data.list)), function(x) data.frame(
-          max.data.list[[x]][,c(1,2)], data.list[[x]][, unique(c(column.indcies))]))
-  }
+PlotWindowSize <- function(drift.type, window.length, subset.lengths, directory) {
+  data.list <- lapply(subset.lengths, function(x) GetTimelineData(drift.type, x, directory, window.length))
+  result.table <- Reduce(function(x, y) merge.data.frame(x, y, by = "points"), data.list)
   
-  timeline.plot <- PlotDriftTimeline(data.list[[1]], window.length, 900, 200) %>%
+  timeline.plot <- PlotDriftTimeline(result.table, window.length, 900, 200) %>%
     layout(showlegend = TRUE, title = paste(drift.type, window.length)) %>%
     layout(
       annotations = list(
