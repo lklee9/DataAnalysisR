@@ -1,2 +1,3 @@
 # app launching code, e.g.:
-# runApp("./app/shiny/", launch.browser=TRUE)
+library(shiny)
+runApp("./shiny/", launch.browser=FALSE)
