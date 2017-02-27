@@ -271,6 +271,8 @@ shinyServer(function(input, output) {
       }
       else if (input$analyse.type == "compare") {
           shinyjs::show("analysis.plot")
+            shinyjs::hide("analysis.detailed.plot")
+            shinyjs::hide("analysis.2att.plot")
           output$analysis.plot <- renderPlot(Histogram(data.table$data[seq(input$numeric.start.index, (input$numeric.middle.index - 1)), ], 
                                                        data.table$data[seq(input$numeric.middle.index, input$numeric.end.index), ]))
       }
@@ -286,23 +288,33 @@ shinyServer(function(input, output) {
           }
           drift.type <- input$analyse.drift.type
           if (drift.type == "COVARIATE") {
+            shinyjs::hide("analysis.detailed.plot")
+            shinyjs::show("analysis.2att.plot")
               results.cov.1 <- ResultTable(paste(data.out.foler, data.table$name, "analyse/1-attributes_covariate.csv", sep = "/"))
               results.cov.2 <- ResultTable(paste(data.out.foler, data.table$name, "analyse/2-attributes_covariate.csv", sep = "/"))
               output$analysis.2att.plot <- renderPlotly(VisualPairAttributes(results.cov.1, results.cov.2, drift.type = "Covariate"))
           }
           else if (drift.type == "JOINT") {
+            shinyjs::hide("analysis.detailed.plot")
+            shinyjs::show("analysis.2att.plot")
               results.joint.1 <- ResultTable(paste(data.out.foler, data.table$name, "analyse/1-attributes_joint.csv", sep = "/"))
               results.joint.2 <- ResultTable(paste(data.out.foler, data.table$name, "analyse/2-attributes_joint.csv", sep = "/"))
               output$analysis.2att.plot <- renderPlotly(VisualPairAttributes(results.joint.1, results.joint.2, drift.type = "Joint"))
           }
           else if (drift.type == "POSTERIOR") {
+            shinyjs::show("analysis.detailed.plot")
+            shinyjs::show("analysis.2att.plot")
               results.pos.d.1 <- ResultTable(paste(data.out.foler, data.table$name, "analyse/1-attributes_posterior_detailed.csv", sep = "/"))
               results.pos.1 <- ResultTable(paste(data.out.foler, data.table$name, "analyse/1-attributes_posterior.csv", sep = "/"))
               results.pos.2 <- ResultTable(paste(data.out.foler, data.table$name, "analyse/2-attributes_posterior.csv", sep = "/"))
-              output$analysis.2att.plot <- renderPlotly(VisualPairAttributes(results.pos.1, results.pos.2, drift.type = "Posterior"))
+              tmp_plot <- plotly_build(VisualPairAttributes(results.pos.1, results.pos.2, drift.type = "Posterior"))
+              tmp_plot$layout$margin$b <- 150
+              output$analysis.2att.plot <- renderPlotly(tmp_plot)
               output$analysis.detailed.plot <- renderPlotly(VisualSingleAttributeStructure(results.pos.d.1, "Posterior"))
           }
           else if (drift.type == "LIKELIHOOD") {
+            shinyjs::show("analysis.detailed.plot")
+            shinyjs::show("analysis.2att.plot")
               results.like.d.1 <- ResultTable(paste(data.out.foler, data.table$name, "analyse/1-attributes_likelihood_detailed.csv", sep = "/"))
               results.like.1 <- ResultTable(paste(data.out.foler, data.table$name, "analyse/1-attributes_likelihood.csv", sep = "/"))
               results.like.2 <- ResultTable(paste(data.out.foler, data.table$name, "analyse/2-attributes_likelihood.csv", sep = "/"))
