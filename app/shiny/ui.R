@@ -37,8 +37,10 @@ loadDataFile <- sidebarLayout(
     )
     ),
   mainPanel(
-      #includeHTML("../Introduction.html")
-      dataTableOutput("result.files")
+    tabsetPanel(
+      tabPanel("Welcome", includeHTML("../Introduction.html")),
+      tabPanel("Results", dataTableOutput("result.files"))
+    )
     )
   )
 
@@ -89,7 +91,7 @@ timelinePlotPage <- fluidPage(verticalLayout(
 ))
 
 shinyUI(fluidPage(
-  navbarPage("Spectra Analysis",
+  navbarPage("Drift Analysis",
              tabPanel("Data Selection", loadDataFile),
              tabPanel("Analyse", timelinePlotPage)
 )
