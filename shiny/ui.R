@@ -69,9 +69,10 @@ timelinePlotPage <- fluidPage(verticalLayout(
                           "Select Analyse Type", 
                           c("Drift Analysis" = "analysis", "Compare Distributions" = "compare")),
               fluidRow(
-                  column(4, uiOutput("start.index")),
-                  column(4, uiOutput("middle.index")),
-                  column(4, uiOutput("end.index"))
+                  column(3, uiOutput("start.index.1")),
+                  column(3, uiOutput("end.index.1")),
+                  column(3, uiOutput("start.index.2")),
+                  column(3, uiOutput("end.index.2"))
               ),
               selectInput("analyse.drift.type", 
                           "Select Drift Type",

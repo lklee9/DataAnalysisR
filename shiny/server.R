@@ -244,25 +244,32 @@ shinyServer(function(input, output) {
   })
   
   # --------- Compare / Analyse
-  output$start.index <- renderUI({
+  output$start.index.1 <- renderUI({
       if (is.null(data.table)) {
           return()
       }
-      numericInput("numeric.start.index", "Split Start Index", value = 0, min = 0, max = nrow(data.table$data), step = 1)
+      numericInput("numeric.start.index.1", "Winodw 1 Start Index", value = 1, min = 1, max = nrow(data.table$data), step = 1)
   })
   
-  output$middle.index <- renderUI({
+  output$end.index.1 <- renderUI({
       if (is.null(data.table)) {
           return()
       }
-      numericInput("numeric.middle.index", "Split Middle Index", value = nrow(data.table$data) / 2, min = 0, max = nrow(data.table$data), step = 1)
+      numericInput("numeric.end.index.1", "Window 1 End Index", value = nrow(data.table$data) / 2, min = input$numeric.start.index.1, max = nrow(data.table$data), step = 1)
   })
   
-  output$end.index <- renderUI({
+  output$start.index.2 <- renderUI({
       if (is.null(data.table)) {
           return()
       }
-      numericInput("numeric.end.index", "Split End Index", value = nrow(data.table$data) - 1, min = 0, max = nrow(data.table$data), step = 1)
+      numericInput("numeric.start.index.2", "Winodw 2 Start Index", value = (nrow(data.table$data) / 2) + 1, min = 1, max = nrow(data.table$data), step = 1)
+  })
+  
+  output$end.index.2 <- renderUI({
+      if (is.null(data.table)) {
+          return()
+      }
+      numericInput("numeric.end.index.2", "Window 2 End Index", value = nrow(data.table$data), min = input$numeric.start.index.2, max = nrow(data.table$data), step = 1)
   })
   
   observeEvent(input$analyse.plot.run, {
@@ -273,16 +280,17 @@ shinyServer(function(input, output) {
           shinyjs::show("analysis.plot")
             shinyjs::hide("analysis.detailed.plot")
             shinyjs::hide("analysis.2att.plot")
-          output$analysis.plot <- renderPlot(Histogram(data.table$data[seq(input$numeric.start.index, (input$numeric.middle.index - 1)), ], 
-                                                       data.table$data[seq(input$numeric.middle.index, input$numeric.end.index), ]))
+          output$analysis.plot <- renderPlot(Histogram(data.table$data[seq(input$numeric.start.index.1, (input$numeric.end.index.1)), ], 
+                                                       data.table$data[seq(input$numeric.start.index.2, input$numeric.end.index.2), ]))
       }
       else {
           shinyjs::hide("analysis.plot")
-          analyse.folder <- paste(data.out.foler, data.table$name, "analyse", sep = "/")
+          window.folder <- paste(input$numeric.start.index.1, input$numeric.end.index.1, input$numeric.start.index.2, input$numeric.end.index.2, sep = "_")
+          analyse.folder <- paste(data.out.foler, data.table$name, "analyse", window.folder, sep = "/")
           if (length(list.files(analyse.folder)) == 0) {
               withProgress(message = "Running Analysis...", {
                   ret <- system2("java", c("-jar", "../MarTVarD.jar", "analyse",
-                                           "1,2", paste(input$numeric.start.index + 1, input$numeric.middle.index, input$numeric.end.index, sep = ","), 
+                                           "1,2", paste(input$numeric.start.index.1, input$numeric.end.index.1, input$numeric.start.index.2, input$numeric.end.index.2, sep = ","), 
                                            paste(data.out.foler, data.table$name, sep = "/"), data.table$paths))         
                   })
           }
@@ -290,23 +298,23 @@ shinyServer(function(input, output) {
           if (drift.type == "COVARIATE") {
             shinyjs::hide("analysis.detailed.plot")
             shinyjs::show("analysis.2att.plot")
-              results.cov.1 <- ResultTable(paste(data.out.foler, data.table$name, "analyse/1-attributes_covariate.csv", sep = "/"))
-              results.cov.2 <- ResultTable(paste(data.out.foler, data.table$name, "analyse/2-attributes_covariate.csv", sep = "/"))
+              results.cov.1 <- ResultTable(paste(analyse.folder, "1-attributes_covariate.csv", sep = "/"))
+              results.cov.2 <- ResultTable(paste(analyse.folder, "2-attributes_covariate.csv", sep = "/"))
               output$analysis.2att.plot <- renderPlotly(VisualPairAttributes(results.cov.1, results.cov.2, drift.type = "Covariate"))
           }
           else if (drift.type == "JOINT") {
             shinyjs::hide("analysis.detailed.plot")
             shinyjs::show("analysis.2att.plot")
-              results.joint.1 <- ResultTable(paste(data.out.foler, data.table$name, "analyse/1-attributes_joint.csv", sep = "/"))
-              results.joint.2 <- ResultTable(paste(data.out.foler, data.table$name, "analyse/2-attributes_joint.csv", sep = "/"))
+              results.joint.1 <- ResultTable(paste(analyse.folder, "1-attributes_joint.csv", sep = "/"))
+              results.joint.2 <- ResultTable(paste(analyse.folder, "2-attributes_joint.csv", sep = "/"))
               output$analysis.2att.plot <- renderPlotly(VisualPairAttributes(results.joint.1, results.joint.2, drift.type = "Joint"))
           }
           else if (drift.type == "POSTERIOR") {
             shinyjs::show("analysis.detailed.plot")
             shinyjs::show("analysis.2att.plot")
-              results.pos.d.1 <- ResultTable(paste(data.out.foler, data.table$name, "analyse/1-attributes_posterior_detailed.csv", sep = "/"))
-              results.pos.1 <- ResultTable(paste(data.out.foler, data.table$name, "analyse/1-attributes_posterior.csv", sep = "/"))
-              results.pos.2 <- ResultTable(paste(data.out.foler, data.table$name, "analyse/2-attributes_posterior.csv", sep = "/"))
+              results.pos.d.1 <- ResultTable(paste(analyse.folder, "1-attributes_posterior_detailed.csv", sep = "/"))
+              results.pos.1 <- ResultTable(paste(analyse.folder, "1-attributes_posterior.csv", sep = "/"))
+              results.pos.2 <- ResultTable(paste(analyse.folder, "2-attributes_posterior.csv", sep = "/"))
               tmp_plot <- plotly_build(VisualPairAttributes(results.pos.1, results.pos.2, drift.type = "Posterior"))
               tmp_plot$layout$margin$b <- 150
               output$analysis.2att.plot <- renderPlotly(tmp_plot)
@@ -315,9 +323,9 @@ shinyServer(function(input, output) {
           else if (drift.type == "LIKELIHOOD") {
             shinyjs::show("analysis.detailed.plot")
             shinyjs::show("analysis.2att.plot")
-              results.like.d.1 <- ResultTable(paste(data.out.foler, data.table$name, "analyse/1-attributes_likelihood_detailed.csv", sep = "/"))
-              results.like.1 <- ResultTable(paste(data.out.foler, data.table$name, "analyse/1-attributes_likelihood.csv", sep = "/"))
-              results.like.2 <- ResultTable(paste(data.out.foler, data.table$name, "analyse/2-attributes_likelihood.csv", sep = "/"))
+              results.like.d.1 <- ResultTable(paste(analyse.folder, "1-attributes_likelihood_detailed.csv", sep = "/"))
+              results.like.1 <- ResultTable(paste(analyse.folder, "1-attributes_likelihood.csv", sep = "/"))
+              results.like.2 <- ResultTable(paste(analyse.folder, "2-attributes_likelihood.csv", sep = "/"))
               output$analysis.2att.plot <- renderPlotly(VisualPairAttributes(results.like.1, results.like.2, drift.type = "Likelihood"))
               output$analysis.detailed.plot <- renderPlotly(VisualSingleLikelihoodAttribute(results.like.d.1))
           }
