@@ -4,3 +4,4 @@
 .Ruserdata
 *.jar
 app/shiny/data_out/
+packrat/lib*/
