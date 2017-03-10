@@ -21,7 +21,8 @@ PlotAllWindowSizes <- function(drift.type, subset.length, directory, column.indc
               title = paste(drift.type)) %>%
     layout(
       annotations = list(
-      list(x = 1.235 , y = 1.08, text = "Window Sizes - Attribute", showarrow = F, xref='paper', yref='paper')))
+      list(x = 1.235 , y = 1.08, text = "Window Sizes - Attribute", showarrow = F, xref='paper', yref='paper')),
+      autosize = T)
       
   return(g)
 }
