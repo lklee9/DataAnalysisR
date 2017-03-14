@@ -18,10 +18,10 @@ source("../../../core/verification/compare_distributions.R")
 In this dataset, 48 instances represents all the data within a day, and therefore, 336 represents a week and 1461 instances roughly represents a month.
 
 ```{r electricity, echo = FALSE, message = FALSE, warning = FALSE}
-PlotAllWindowSizes("COVARIATE", 1, "../../../../../data_out/elecNormNew/moving_chunk/", c())
-PlotAllWindowSizes("LIKELIHOOD", 1, "../../../../../data_out/elecNormNew/moving_chunk/", c())
-PlotAllWindowSizes("POSTERIOR", 1, "../../../../../data_out/elecNormNew/moving_chunk/", c())
-PlotAllWindowSizes("JOINT", 1, "../../../../../data_out/elecNormNew/moving_chunk/", c())
+PlotAllWindowSizes("COVARIATE", 1, "../../../../data_out/elecNormNew/moving_chunk/", c())
+PlotAllWindowSizes("LIKELIHOOD", 1, "../../../../data_out/elecNormNew/moving_chunk/", c())
+PlotAllWindowSizes("POSTERIOR", 1, "../../../../data_out/elecNormNew/moving_chunk/", c())
+PlotAllWindowSizes("JOINT", 1, "../../../../data_out/elecNormNew/moving_chunk/", c())
 ```
 
 One thing to note from the `Posterior` graph (window size 336) above is that at some points 
@@ -33,18 +33,21 @@ Furthermore, there seems to be an event at point `17532` that caused large drift
 Therefore, it will make most sense to analyse the drift between data before and after this point.
 
 ```{r detail, echo = FALSE}
-results.cov.1 <- ResultTable("../../../../../data_out/elecNormNew/analyse/1-attributes_covariate.csv")
-results.joint.1 <- ResultTable("../../../../../data_out/elecNormNew/analyse/1-attributes_joint.csv")
-results.pos.d.1 <- ResultTable(paste0("../../../../../data_out/elecNormNew/analyse/1-attributes_posterior_detailed.csv"))
-results.pos.1 <- ResultTable(paste0("../../../../../data_out/elecNormNew/analyse/1-attributes_posterior.csv"))
-results.pos.2 <- ResultTable(paste0("../../../../../data_out/elecNormNew/analyse/2-attributes_posterior.csv"))
-results.like.d.1 <- ResultTable(paste0("../../../../../data_out/elecNormNew/analyse/1-attributes_likelihood_detailed.csv"))
-results.like.1 <- ResultTable(paste0("../../../../../data_out/elecNormNew/analyse/1-attributes_likelihood.csv"))
-results.like.2 <- ResultTable(paste0("../../../../../data_out/elecNormNew/analyse/2-attributes_likelihood.csv"))
+results.cov.1 <- ResultTable("../../../../data_out/elecNormNew/analyse/1_22656_22657_45311/1-attributes_covariate.csv")
+results.cov.2 <- ResultTable("../../../../data_out/elecNormNew/analyse/1_22656_22657_45311/2-attributes_covariate.csv")
+results.joint.1 <- ResultTable("../../../../data_out/elecNormNew/analyse/1_22656_22657_45311/1-attributes_joint.csv")
+results.joint.2 <- ResultTable("../../../../data_out/elecNormNew/analyse/1_22656_22657_45311/2-attributes_joint.csv")
+results.pos.d.1 <- ResultTable(paste0("../../../../data_out/elecNormNew/analyse/1_22656_22657_45311/1-attributes_posterior_detailed.csv"))
+results.pos.1 <- ResultTable(paste0("../../../../data_out/elecNormNew/analyse/1_22656_22657_45311/1-attributes_posterior.csv"))
+results.pos.2 <- ResultTable(paste0("../../../../data_out/elecNormNew/analyse/1_22656_22657_45311/2-attributes_posterior.csv"))
+results.like.d.1 <- ResultTable(paste0("../../../../data_out/elecNormNew/analyse/1_22656_22657_45311/1-attributes_likelihood_detailed.csv"))
+results.like.1 <- ResultTable(paste0("../../../../data_out/elecNormNew/analyse/1_22656_22657_45311/1-attributes_likelihood.csv"))
+results.like.2 <- ResultTable(paste0("../../../../data_out/elecNormNew/analyse/1_22656_22657_45311/2-attributes_likelihood.csv"))
 ```
 
 ### Detailed Likelihood (Single Attributes)
-```{r, echo = FALSE}
+```{r}
+  VisualPairAttributes(results.like.1, results.like.2, drift.type = "Likelihood", title = "2 Attributes")
   VisualSingleLikelihoodAttribute(results.like.d.1)
 ```
 
@@ -56,8 +59,9 @@ possibily significant difference between each other.
 This difference probability means that the `Covariate` drift of `nswprice` affected the distribution given the class `DOWN` more that the class `UP`.
 
 ### Detailed Posterior (Single Attributes)
-```{r, echo = FALSE}
-  VisualSingleAttributeStructure(results.pos.d.1, "posterior")
+```{r}
+  VisualPairAttributes(results.pos.1, results.pos.2, drift.type = "Posteriror", title = "2 Attributes")
+  VisualSingleAttributeStructure(results.pos.d.1, "Posterior 1 Attribute")
 ```
 
 From the Detailed Posterior figure, we can observe that most of the posterior drift is from the attributes `transfer` and `vicdemand`.
@@ -68,10 +72,10 @@ indicating that the class distribution given these values has changed significan
 Similarly for the continous attribute `vicdemand`, most of the posterior drift occurs on the larger values of the attribute also indicating the change in class distribution give these attribute values.
 
 ```{r}
-    VisualSingleAttribute(results.cov.1)
-    VisualSingleAttribute(results.joint.1)
-    VisualPairAttributes(results.pos.1, results.pos.2)
-    VisualPairAttributes(results.like.1, results.like.2)
+    VisualPairAttributes(results.cov.1, results.cov.2, drift.type = "Covariate", title = "2 Attributes")
+    VisualSingleAttribute(results.cov.1, drift.type = "Covariate 1 Attribute")
+    VisualPairAttributes(results.joint.1, results.joint.2, drift.type = "Joint", title = "2 Attributes")
+    VisualSingleAttribute(results.joint.1, drift.type = "Joint 1 Attribute")
 ```
 
 
@@ -97,7 +101,7 @@ This instance corresponds to the difference between the da
 
 ### Comparing distributions 10,000 instances before and after NEM1 started
 ```{r, echo = FALSE} 
-data.all <- read.arff("../../../../../datasets/elecNormNew.arff")
+data.all <- read.arff("../../../../datasets/elecNormNew.arff")
 Histogram(data.all[seq(7232,17232),], data.all[seq(17233,27233),])
 ````
 
