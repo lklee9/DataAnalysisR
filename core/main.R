@@ -1,8 +1,8 @@
-source("visualise_results/mds.R")
-source("visualisation.R")
-source("visualise_results/result_table.R")
-source("verification/read_data.R")
-source("verification/compare_distributions.R")
+source("core/visualise_results/mds.R")
+source("core/visualisation.R")
+source("core/visualise_results/result_table.R")
+source("core/verification/read_data.R")
+source("core/verification/compare_distributions.R")
 library(knitr)  
 
 
@@ -33,12 +33,12 @@ RenderHTML <- function(file1, file2) {
 }
 
 RenderAll <- function() {
-  RenderHTML("20130419", "20131129")
+  #RenderHTML("20130419", "20131129")
   RenderHTML("20130505", "20131129")
-  RenderHTML("20130606", "20131129")
-  RenderHTML("20130708", "20131129")
-  RenderHTML("20130910", "20131129")
-  RenderHTML("20131113", "20131129")
+  #RenderHTML("20130606", "20131129")
+  #RenderHTML("20130708", "20131129")
+  #RenderHTML("20130910", "20131129")
+  #RenderHTML("20131113", "20131129")
 }
 
 #file1 <- "../datasets/train_seed/20130505.arff"
