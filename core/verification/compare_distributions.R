@@ -7,10 +7,10 @@ library(arules)
 
 ## ---- compare
 
-Histogram <- function(data1, data2) {
+Histogram <- function(data1, data2, n.bin = NA) {
   plot.list <- list()
   for (i in 1:length(data1)) {
-    plot <- SingleHistogram(data1, data2, i)
+    plot <- SingleHistogram(data1, data2, i, n.bin)
     if (length(plot) > 1 || !is.na(plot)) {
       plot.list[[length(plot.list) + 1]] <- plot
     }
@@ -30,9 +30,14 @@ Histogram <- function(data1, data2) {
   }
 }
 
-SingleHistogram <- function(data1, data2, column.index) {
+SingleHistogram <- function(data1, data2, column.index, n.bin = NA) {
     data.all.1 <- data.frame(data1[, column.index])
     data.all.2 <- data.frame(data2[, column.index])
+    if (!is.na(n.bin) & !is.factor(data.all.1[,1])) {
+      data.all.vec <- discretize(c(data.all.1[, 1], data.all.2[,1]), method = "frequency", categories = n.bin, ordered = TRUE)
+      data.all.1[, 1] <- data.all.vec[seq(1,nrow(data.all.1))]
+      data.all.2[, 1] <- data.all.vec[seq((nrow(data.all.1) + 1), (nrow(data.all.1) + nrow(data.all.2)))]
+    }
     data.all.1$type <- "before"
     data.all.2$type <- "after"
     column.name <- names(data1)[column.index]
@@ -41,7 +46,7 @@ SingleHistogram <- function(data1, data2, column.index) {
     data.all <- rbind(data.all.1, data.all.2)
     plot <- NA
     if (is.factor(data.all[, 1])) {
-      plot <- ggplot(data.all, aes(value, fill = type)) + geom_bar(width = 1, alpha = 0.5, position = 'dodge')
+      plot <- ggplot(data.all, aes(x=value, fill = type)) + geom_bar(aes(y=..count../sum(..count..)), width = 1, alpha = 0.5, position = 'dodge')
       plot <- plot + labs(xlab(column.name))
     }
     else {
@@ -59,5 +64,4 @@ SingleHistogram <- function(data1, data2, column.index) {
     }
     return(plot)
 }
-
 ## ---- end-of-compare

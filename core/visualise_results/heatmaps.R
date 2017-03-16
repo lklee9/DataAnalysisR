@@ -85,16 +85,22 @@ matrixToHeatmap <- function(values.matrix, z_min, z_max, labels = c("", "", ""),
   cols <- scales::col_numeric(c("green", "red"), domain = NULL)(vals)
   colz <- setNames(data.frame(vals[o], cols[o]), NULL)
   
+  # order matrix by label since albels can't be unoordered fr plotly
+  values.matrix <- values.matrix[, order(colnames(values.matrix))]
+  values.matrix <- values.matrix[order(rownames(values.matrix)), ]
+  
   plot <- plot_ly(x = colnames(values.matrix), 
                   y = rownames(values.matrix), 
                   z = values.matrix, 
                   zmin = z_min,
                   zmax = z_max,
                   colorscale = colz, 
+                  width = size[1],
+                  height = size[2],
                   type = "heatmap") %>% 
-    layout(margin = list(l = 100, r = 30, b = 100, t = 50, pad = 10),
-           width = size[1],
-           height = size[2],
+    layout(#margin = list(l = 100, r = 30, b = 100, t = 50, pad = 10),
+           #width = size[1],
+           #height = size[2],
            title = labels[1], 
            xaxis = list(title = labels[2]), 
            yaxis = list(title = labels[3]))

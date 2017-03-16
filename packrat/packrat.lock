@@ -1,6 +1,6 @@
 PackratFormat: 1.4
 PackratVersion: 0.4.8.1
-RVersion: 3.3.1
+RVersion: 3.3.2
 Repos: CRAN=https://cran.rstudio.com/,
     CRANextra=http://www.stats.ox.ac.uk/pub/RWin
 
@@ -11,13 +11,19 @@ Hash: 14dfb3e8ffe20996118306ff4de1fab2
 
 Package: DBI
 Source: CRAN
-Version: 0.5-1
-Hash: 375869004db963f9915f2b8a49b4a718
+Version: 0.6
+Hash: c1a897fa11e50c1f70258830fc50b1f3
 
 Package: GlobalOptions
 Source: CRAN
-Version: 0.0.10
-Hash: 188372cc53cd743c621e7847edb6df0d
+Version: 0.0.11
+Hash: bb219148e33d7554addc977558d93fd5
+
+Package: PKI
+Source: CRAN
+Version: 0.1-3
+Hash: aca3e459c659b6d8266538520f72ba19
+Requires: base64enc
 
 Package: R6
 Source: CRAN
@@ -29,6 +35,17 @@ Source: CRAN
 Version: 1.1-2
 Hash: c0d56cd15034f395874c870141870c25
 
+Package: RCurl
+Source: CRAN
+Version: 1.95-4.8
+Hash: 79c7d5a8684e44e0e3426d3093aa7d90
+Requires: bitops
+
+Package: RJSONIO
+Source: CRAN
+Version: 1.3-0
+Hash: fb672e20eb6f3010a3639f855d8ef6de
+
 Package: Rcpp
 Source: CRAN
 Version: 0.12.9
@@ -36,8 +53,8 @@ Hash: 7ab41cbe74918de8de87e435ef17e92d
 
 Package: arules
 Source: CRAN
-Version: 1.5-0
-Hash: 9289eb5bd48b9b72b356e5dc146cd729
+Version: 1.5-2
+Hash: 51557874151059c001b220da3bca3578
 
 Package: assertthat
 Source: CRAN
@@ -67,8 +84,8 @@ Requires: bitops
 
 Package: circlize
 Source: CRAN
-Version: 0.3.9
-Hash: 45aac5f8bf1c66bb234b1c5f381b6062
+Version: 0.3.10
+Hash: acd674f83c9fe255f6402710a3c064bb
 Requires: GlobalOptions, colorspace, shape
 
 Package: colorspace
@@ -107,6 +124,11 @@ Package: foreign
 Source: CRAN
 Version: 0.8-67
 Hash: 34615798e8a5c7bb2f69f4efc3e17b71
+
+Package: formatR
+Source: CRAN
+Version: 1.4
+Hash: b2a47a2b91737978cf50ba95825a9cd1
 
 Package: ggplot2
 Source: CRAN
@@ -167,8 +189,8 @@ Requires: R6, curl, jsonlite, mime, openssl
 
 Package: jsonlite
 Source: CRAN
-Version: 1.2
-Hash: 3a193a612cae6814719ed523f7e7cf44
+Version: 1.3
+Hash: b9cc3c97b7a6cd513e9b516fe881d6c9
 
 Package: knitr
 Source: CRAN
@@ -263,6 +285,17 @@ Version: 1.2
 Hash: fdcac51a7f47decd60556ceefc3c26b1
 Requires: backports
 
+Package: rsconnect
+Source: CRAN
+Version: 0.7
+Hash: 90add0a55eb94c2576714af9ee30a884
+Requires: PKI, RCurl, RJSONIO, digest, packrat, rstudioapi, yaml
+
+Package: rstudioapi
+Source: CRAN
+Version: 0.6
+Hash: fd256f8bfb9a64cc35f98b0decb1a79f
+
 Package: scales
 Source: CRAN
 Version: 0.4.1
@@ -299,8 +332,8 @@ Hash: 1ad6b1cc11d982ac233bf2fa2f7c9684
 
 Package: stringr
 Source: CRAN
-Version: 1.1.0
-Hash: 4d21d0063b37a17ea18eaec6acd29bf3
+Version: 1.2.0
+Hash: 25a86d7f410513ebb7c0bc6a5e16bdc3
 Requires: magrittr, stringi
 
 Package: tibble

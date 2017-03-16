@@ -14,7 +14,7 @@ PlotAllWindowSizes <- function(drift.type, subset.length, directory, column.indc
   }
   plot.list <- lapply(seq(1:length(data.list)), 
                       function(x) 
-                        PlotDriftTimeline(data.list[[x]], window.sizes[x], 900, 200 * length(data.list), ymax, x.raw.values))
+                        PlotDriftTimeline(data.list[[x]], window.sizes[x], 900, 300 * length(data.list), ymax, x.raw.values))
   
   g <- layout(subplot(plot.list, nrows = length(plot.list), shareX = TRUE, shareY = TRUE),
               showlegend = TRUE, 
@@ -34,7 +34,7 @@ PlotWindowSize <- function(drift.type, window.length, subset.lengths, directory,
     result.table <- result.table[[1]]
   }
   
-  timeline.plot <- PlotDriftTimeline(result.table, window.length, 900, 200, ymax, x.raw.values) %>%
+  timeline.plot <- PlotDriftTimeline(result.table, window.length, 900, 300, ymax, x.raw.values) %>%
     layout(showlegend = TRUE, title = paste(drift.type, window.length)) %>%
     layout(
       annotations = list(
@@ -56,10 +56,10 @@ PlotDriftTimeline <- function(drift.timeline, window.size, width, height, ymax, 
     drift.timeline[, 1] <- x.raw.values[drift.timeline[, 1]]
   }
   col.names <- names(drift.timeline)
-   #p <- plot_ly(drift.timeline, x = ~points, y = drift.timeline[, 2], width = width, height = height,
-   #             name = paste(window.size, names(drift.timeline)[2]), type = "scatter", mode = "lines") %>%
-  p <- plot_ly(drift.timeline, x = ~points, y = drift.timeline[, 2],
+  p <- plot_ly(drift.timeline, x = ~points, y = drift.timeline[, 2], width = width, height = height,
                name = paste(window.size, names(drift.timeline)[2]), type = "scatter", mode = "lines") %>%
+  #p <- plot_ly(drift.timeline, x = ~points, y = drift.timeline[, 2],
+  #             name = paste(window.size, names(drift.timeline)[2]), type = "scatter", mode = "lines") %>%
      layout(yaxis = list(range = c(0,ymax)))
   if (ncol(drift.timeline) > 2) {
     for (i in 3:ncol(drift.timeline)) {
@@ -71,7 +71,8 @@ PlotDriftTimeline <- function(drift.timeline, window.size, width, height, ymax, 
 }
 
 GetTimelineData <- function(drift.type, subset.length, directory, window.size = ".*") {
-    files.all <- list.files(path = directory, pattern = paste0(drift.type, "_", window.size, "_", subset.length))
+    files.all <- list.files(path = directory, pattern = paste0(drift.type, "_", window.size, "_", subset.length, ".csv"))
+    print(files.all)
     window.sizes <- sapply(files.all, function(x) as.integer(strsplit(x, "[_.]")[[1]][2]))
     files.all <- files.all[order(window.sizes, files.all)]
     window.sizes <- sort(window.sizes)

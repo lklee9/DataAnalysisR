@@ -6,3 +6,6 @@
 app/shiny/data_out/
 packrat/lib*/
 shiny/data_out/
+Notebook/
+packrat/bundles/DataAnalysisR-2017-03-14.tar.gz
+data_out/

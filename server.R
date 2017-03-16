@@ -174,8 +174,7 @@ shinyServer(function(input, output) {
           print(cmd)
           ret <- system2("java", c("-jar", "./MarTVarD.jar", input$timeline.type, 
                                    paste(subset.lengths, collapse = ","), sizes.current, 
-                                   paste(data.out.foler, data.table$name, sep = "/"), data.table$paths),
-                         stdout = FALSE, wait = FALSE)
+                                   paste(data.out.foler, data.table$name, sep = "/"), data.table$paths))
       })
   })
   
@@ -292,8 +291,7 @@ shinyServer(function(input, output) {
               withProgress(message = "Running Analysis...", {
                   ret <- system2("java", c("-jar", "./MarTVarD.jar", "analyse",
                                            "1,2", paste(input$numeric.start.index.1, input$numeric.end.index.1, input$numeric.start.index.2, input$numeric.end.index.2, sep = ","), 
-                                           paste(data.out.foler, data.table$name, sep = "/"), data.table$paths),
-                                 stdout = FALSE, wait = FALSE)         
+                                           paste(data.out.foler, data.table$name, sep = "/"), data.table$paths))
                   })
           }
           drift.type <- input$analyse.drift.type
