@@ -35,7 +35,7 @@ selectTests <- function(spectra, test.ids) {
   return(spectra[test.ids, ])
 }
 
-shinyServer(function(input, output) {
+shinyServer(function(input, output, session) {
   data.table <- reactiveValues(data = NULL, name = NULL, paths = NULL)
       
   observe({
@@ -174,8 +174,11 @@ shinyServer(function(input, output) {
           print(cmd)
           ret <- system2("java", c("-jar", "./MarTVarD.jar", input$timeline.type, 
                                    paste(subset.lengths, collapse = ","), sizes.current, 
-                                   paste(data.out.foler, data.table$name, sep = "/"), data.table$paths))
+                                   paste(data.out.foler, data.table$name, sep = "/"), data.table$paths),
+                         stdout = "stdout.txt", stderr = "stderr.txt")
+          print("done")
       })
+    updateSelectInput(session, "select.timeline.plot.data", choices = list.files(path = data.out.foler))
   })
   
   # --------- Timeline plotter
@@ -231,6 +234,10 @@ shinyServer(function(input, output) {
                                        )),
                       function(x) strsplit(x, split = "[_.]")[[1]][3])),
                   multiple = TRUE)
+  })
+  
+  observeEvent(input$timeline.plot.reload, {
+    
   })
   
   observeEvent(input$timeline.plot.run, {

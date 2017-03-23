@@ -56,10 +56,10 @@ PlotDriftTimeline <- function(drift.timeline, window.size, width, height, ymax, 
     drift.timeline[, 1] <- x.raw.values[drift.timeline[, 1]]
   }
   col.names <- names(drift.timeline)
-  p <- plot_ly(drift.timeline, x = ~points, y = drift.timeline[, 2], width = width, height = height,
-               name = paste(window.size, names(drift.timeline)[2]), type = "scatter", mode = "lines") %>%
-  #p <- plot_ly(drift.timeline, x = ~points, y = drift.timeline[, 2],
+  #p <- plot_ly(drift.timeline, x = ~points, y = drift.timeline[, 2], width = width, height = height,
   #             name = paste(window.size, names(drift.timeline)[2]), type = "scatter", mode = "lines") %>%
+  p <- plot_ly(drift.timeline, x = ~points, y = drift.timeline[, 2],
+               name = paste(window.size, names(drift.timeline)[2]), type = "scatter", mode = "lines") %>%
      layout(yaxis = list(range = c(0,ymax)))
   if (ncol(drift.timeline) > 2) {
     for (i in 3:ncol(drift.timeline)) {
@@ -78,9 +78,6 @@ GetTimelineData <- function(drift.type, subset.length, directory, window.size = 
     window.sizes <- sort(window.sizes)
   
     data.list <- lapply(files.all, function(x) read.csv(paste0(directory, "/", x)))
-    if (subset.length == GetMaxSubsetLength(directory)) {
-        data.list <- lapply(data.list, setNames, c("points", "all_attributes"))
-    }
     return(data.list)
 }
 
