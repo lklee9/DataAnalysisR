@@ -1,5 +1,5 @@
 # DataAnalysisR
-Companion app of DriftMapper in oorder to visualse the results obtained from DriftMapper
+Companion app of DriftMapper in oorder to visualse the results obtained from DriftMapper, https://github.com/LeeLoongKuan/DriftMapper
 
 # Live Demo
 `http://45.63.24.69:3838/DataAnalysisR/`
